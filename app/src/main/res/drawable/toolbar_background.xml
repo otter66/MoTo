@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item>
+        <shape android:shape="rectangle">
+            <solid android:color="@android:color/white"/>
+        </shape>
+    </item>
+
+    <item android:drawable="@drawable/moto_basic_background_color"
+        android:gravity="bottom"
+        android:height="2dp"/>
+</layer-list>

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/homePageItem"
+        android:enabled="true"
+        android:icon="@drawable/selector_home_page"
+        android:title="Home"
+        android:checked="true"
+        app:showAsAction="ifRoom" />
+    <item
+        android:id="@+id/myPageItem"
+        android:enabled="true"
+        android:icon="@drawable/selector_my_page"
+        android:title="myPage"
+        app:showAsAction="ifRoom" />
+</menu>

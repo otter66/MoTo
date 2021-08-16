@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".Activity.LoginActivity">
+
+    <TextView
+        android:id="@+id/appTitleInLogin"
+        android:layout_gravity="center"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/bm_jua"
+        android:text="@string/app_name2"
+        android:textSize="80sp"
+        android:layout_marginBottom="50dp"/>
+
+    <Button
+        android:id="@+id/goToGoogleLoginButton"
+        android:background="@drawable/ic_google_login"
+        android:layout_gravity="center"
+        android:layout_width="152dp"
+        android:layout_height="32dp"
+        android:layout_marginTop="100dp" />
+
+    <LinearLayout
+        android:layout_gravity="bottom|right"
+        android:orientation="vertical"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="10dp"
+        android:layout_marginRight="10dp">
+
+        <ImageView
+            android:layout_width="60dp"
+            android:layout_height="58dp"
+            android:layout_gravity="center"
+            android:background="@drawable/icon_otter" />
+
+        <TextView
+            android:layout_gravity="right|bottom"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/bm_jua"
+            android:textColor="@color/black"
+            android:text="개발자: 수달(otter)"/>
+    </LinearLayout>
+</FrameLayout>

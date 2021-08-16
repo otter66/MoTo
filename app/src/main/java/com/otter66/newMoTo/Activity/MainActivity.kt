@@ -53,11 +53,11 @@ class MainActivity : AppCompatActivity() {
     = BottomNavigationView.OnNavigationItemSelectedListener {
         when (it.itemId) {
             R.id.homePageItem -> {
-                supportFragmentManager.beginTransaction() .replace(R.id.contentLayout, NoticeBoardFragment()) .commit()
+                supportFragmentManager.beginTransaction() .replace(R.id.contentLayout, NoticeBoardFragment()).addToBackStack(null) .commit()
                 true
             }
             R.id.myPageItem -> {
-                supportFragmentManager.beginTransaction() .replace(R.id.contentLayout, MyPageFragment()) .commit()
+                supportFragmentManager.beginTransaction() .replace(R.id.contentLayout, MyPageFragment()).addToBackStack(null) .commit()
                 true
             }
             else -> {
