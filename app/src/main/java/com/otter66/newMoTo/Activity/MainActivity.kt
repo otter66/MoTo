@@ -1,21 +1,21 @@
 package com.otter66.newMoTo.Activity
 
-import android.content.Intent
-import android.os.Bundle
 import android.util.Log
-import androidx.appcompat.app.AppCompatActivity
-import com.otter66.newMoTo.Fragment.MyPageFragment
-import com.otter66.newMoTo.Fragment.NoticeBoardFragment
+import android.os.Bundle
+import android.widget.Toast
 import com.otter66.newMoTo.R
-import com.google.android.material.bottomnavigation.BottomNavigationView
+import android.content.Intent
+import com.google.firebase.ktx.Firebase
+import com.google.firebase.auth.ktx.auth
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
-import com.google.firebase.auth.ktx.auth
+import androidx.appcompat.app.AppCompatActivity
+import com.google.firebase.firestore.ktx.firestore
+import com.otter66.newMoTo.Fragment.MyPageFragment
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.ktx.firestore
-import com.google.firebase.ktx.Firebase
-
+import com.otter66.newMoTo.Fragment.NoticeBoardFragment
+import com.google.android.material.bottomnavigation.BottomNavigationView
 
 class MainActivity : AppCompatActivity() {
 
@@ -53,11 +53,11 @@ class MainActivity : AppCompatActivity() {
     = BottomNavigationView.OnNavigationItemSelectedListener {
         when (it.itemId) {
             R.id.homePageItem -> {
-                supportFragmentManager.beginTransaction() .replace(R.id.contentLayout, NoticeBoardFragment()).addToBackStack(null) .commit()
+                supportFragmentManager.beginTransaction() .replace(R.id.contentLayout, NoticeBoardFragment()) .commit()
                 true
             }
             R.id.myPageItem -> {
-                supportFragmentManager.beginTransaction() .replace(R.id.contentLayout, MyPageFragment()).addToBackStack(null) .commit()
+                supportFragmentManager.beginTransaction() .replace(R.id.contentLayout, MyPageFragment()) .commit()
                 true
             }
             else -> {
@@ -97,4 +97,5 @@ class MainActivity : AppCompatActivity() {
         startActivity(intent)
         finish()
     }
+
 }

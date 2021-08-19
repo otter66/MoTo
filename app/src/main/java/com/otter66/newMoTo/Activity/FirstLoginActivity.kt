@@ -47,10 +47,12 @@ class FirstLoginActivity : AppCompatActivity() {
             Log.d("doubleCheck", "in doubleCheck loot")
 
             if (userWantIdEditText.text == null || userWantIdEditText.text.toString() == "") {
-                Log.d("doubleCheck", "userWantIdEditText.text == null")
                 Toast.makeText(this@FirstLoginActivity, "사용 할 아이디를 입력해주세요", Toast.LENGTH_SHORT).show()
                 idCheck = 0
-            } else {
+            } else if(userWantIdEditText.text.length > 12) {
+                Toast.makeText(this@FirstLoginActivity, "12자 이내로 작성해 주세요", Toast.LENGTH_SHORT).show()
+                idCheck = 0
+            }else {
                 Log.d("doubleCheck", "userWantIdEditText.text != null")
                 db.collection("users")
                     .get()

@@ -8,9 +8,12 @@
         <entry key="app/src/main/res/font/bm_jua.xml" value="0.2864583333333333" />
         <entry key="app/src/main/res/layout/activity_login.xml" value="0.20244565217391305" />
         <entry key="app/src/main/res/layout/activity_main.xml" value="0.1721014492753623" />
+        <entry key="app/src/main/res/layout/activity_post.xml" value="0.22418478260869565" />
+        <entry key="app/src/main/res/layout/fragment_my_page.xml" value="0.22056159420289856" />
+        <entry key="app/src/main/res/layout/fragment_notice_board.xml" value="0.1838768115942029" />
         <entry key="app/src/main/res/layout/fragment_post.xml" value="0.25" />
         <entry key="app/src/main/res/layout/item_image_slider_layout.xml" value="0.19791666666666666" />
-        <entry key="app/src/main/res/layout/item_post.xml" value="0.25" />
+        <entry key="app/src/main/res/layout/item_post.xml" value="0.1802993205477191" />
         <entry key="app/src/main/res/layout/view_toolbar.xml" value="0.20244565217391305" />
         <entry key="app/src/main/res/menu/bottom_navigation_menu.xml" value="0.25625" />
       </map>

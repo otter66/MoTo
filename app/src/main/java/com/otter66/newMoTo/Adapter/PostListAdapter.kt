@@ -2,18 +2,18 @@ package com.otter66.newMoTo.Adapter
 
 import android.app.Activity
 import android.content.Intent
-import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
-import androidx.fragment.app.FragmentActivity
-import androidx.fragment.app.FragmentManager
+import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
-import com.otter66.newMoTo.Fragment.PostFragment
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.ktx.Firebase
+import com.otter66.newMoTo.Activity.PostActivity
 import com.otter66.newMoTo.Data.Post
 import com.otter66.newMoTo.R
 import com.otter66.newMoTo.Data.User
@@ -55,24 +55,38 @@ class PostListAdapter(var activity: Activity, private val postList: ArrayList<Po
         holder.itemPostTitleTextView.text = postList[position].title ?: ""
         holder.itemPostTwoLineDescriptionTextView.text = postList[position].twoLineDescription ?: ""
 
-        //아이템 클릭시 게시글 fragment on
+
         holder.itemView.setOnClickListener {
-            val postFragment = PostFragment()
-            val bundle = Bundle()
-
-            Log.d("test_log", "postInfo: ${postList[holder.adapterPosition]}")
-            bundle.putSerializable("postInfo", postList[holder.adapterPosition])
-            bundle.putSerializable(
+            val intent = Intent(activity, PostActivity::class.java)
+            intent.putExtra("postInfo", postList[holder.adapterPosition])
+            intent.putExtra(
                 "publisherProfileImage",
-                getPublisherProfileImage(postList[holder.adapterPosition].publisher)
-            )
-            postFragment.arguments = bundle
-
-            (activity as FragmentActivity).supportFragmentManager.beginTransaction()
-                .replace(R.id.contentLayout, postFragment)
-                .addToBackStack(null)
-                .commit()
+                getPublisherProfileImage(postList[holder.adapterPosition].publisher))
+            intent.putExtra("currentUserInfo", getCurrentUserInfo())
+            activity.startActivity(intent)
         }
+    }
+
+    private fun getCurrentUserInfo(): User? {
+        val user = Firebase.auth.currentUser
+        val currentUserRef = Firebase.firestore.collection("users").document(user!!.uid)
+        var currentUserInfo: User? = null
+        if (Firebase.auth.currentUser != null) {
+            currentUserRef.get()
+                .addOnSuccessListener { document ->
+                    currentUserInfo = User(
+                        document.data?.get("id").toString(),
+                        document.data?.get("job").toString(),
+                        document.data?.get("group").toString(),
+                        document.data?.get("department").toString(),
+                        document.data?.get("profileImage").toString()
+                    )
+                }
+                .addOnFailureListener { exception ->
+                    Toast.makeText(activity, "글을 가져오는데 실패했습니다.", Toast.LENGTH_SHORT).show()
+                }
+        }
+        return currentUserInfo
     }
 
     override fun getItemCount(): Int {

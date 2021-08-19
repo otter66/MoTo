@@ -1,34 +1,33 @@
-package com.otter66.newMoTo.Fragment
+package com.otter66.newMoTo.Activity
 
 import android.app.Activity
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
-import android.view.LayoutInflater
+import android.util.Log
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
+import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
-import androidx.fragment.app.Fragment
 import com.bumptech.glide.Glide
-import com.otter66.newMoTo.R
+import com.otter66.newMoTo.Adapter.PostSliderAdapter
 import com.otter66.newMoTo.Data.Post
+import com.otter66.newMoTo.Data.User
+import com.otter66.newMoTo.R
 import com.smarteist.autoimageslider.SliderView
 import java.text.SimpleDateFormat
 import java.util.*
-import android.content.Intent
-import android.net.Uri
-import android.util.Log
-import android.widget.Toast
-import androidx.core.content.ContextCompat
-import com.otter66.newMoTo.Adapter.PostSliderAdapter
 
-
-class PostFragment: Fragment() {
+class PostActivity: AppCompatActivity() {
 
     private lateinit var postInformation: Post
     private lateinit var publisherProfileImage: String
-    private lateinit var bundle: Bundle
+    private var currentUserInfo: User? = null
     private lateinit var postSliderAdapter: PostSliderAdapter
     private lateinit var imagesList: MutableList<String>
 
@@ -43,29 +42,27 @@ class PostFragment: Fragment() {
     private lateinit var postLinksContainer: LinearLayout
     private lateinit var postCreatedDateTextView: TextView
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        val rootView = inflater.inflate(R.layout.fragment_post, container, false) as ViewGroup
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_post)
+
 
         imagesList = mutableListOf()
-        bundle = requireArguments()
-        postInformation = bundle.getSerializable("postInfo") as Post
-        publisherProfileImage = bundle.getSerializable("publisherProfileImage").toString()
+        postInformation = intent.getSerializableExtra("postInfo") as Post
+        publisherProfileImage = intent.getStringExtra("publisherProfileImage").toString()
+        currentUserInfo = intent.getStringExtra("currentUserInfo") as User?
+        //todo 현재 유저의 정보와 글 퍼블리셔가 같으면 슬 수정, 삭제 가능하게
 
-        viewInit(rootView)
+        viewInit()
 
-        postSliderAdapter = PostSliderAdapter(activity as Activity, imagesList)
+        postSliderAdapter = PostSliderAdapter(this@PostActivity, imagesList)
 
         setPostInformation()
 
-        return rootView
-    }
+        }
 
     private fun setPostInformation() {
-        Glide.with(activity as Activity).load(publisherProfileImage ?: R.drawable.sample_image)
+        Glide.with(this@PostActivity).load(publisherProfileImage ?: R.drawable.sample_image)
             .override(200, 200).circleCrop().into(postPublisherProfileImageView)
         postPublisherIdTextView.text = postInformation.publisher
         postTitleTextView.text = postInformation.title
@@ -76,6 +73,9 @@ class PostFragment: Fragment() {
                 imagesList.add(postInformation.images!![i]!!)
             }
         }
+        //todo image의 형식인지 체크해주면 좋을 듯
+        if(imagesList.size > 0 && imagesList[0] != "") postImagesSliderView.visibility = View.VISIBLE
+        Log.d("test_log", "imagesListSize: ${imagesList.size}")
         Log.d("test_log", "imagesList: ${imagesList}")
         postSliderAdapter.notifyDataSetChanged()
         postDescriptionTextView.text = postInformation.description
@@ -97,13 +97,13 @@ class PostFragment: Fragment() {
                     )
                     params.setMargins(0, 15, 0, 15)
 
-                    val textView = TextView(activity)
+                    val textView = TextView(this@PostActivity)
                     textView.text = postInformation.linkNames!![i]
                     textView.layoutParams = params
-                    textView.setTextColor(ContextCompat.getColor(activity as Activity, R.color.blue))
+                    textView.setTextColor(ContextCompat.getColor(this@PostActivity, R.color.blue))
                     textView.textSize = 15f
                     textView.typeface =
-                        ResourcesCompat.getFont(activity as Activity, R.font.nanum_myeongjo)
+                        ResourcesCompat.getFont(this@PostActivity, R.font.nanum_myeongjo)
 
                     textView.setOnClickListener {
                         val webIntent = Intent(
@@ -115,22 +115,23 @@ class PostFragment: Fragment() {
 
                     postLinksContainer.addView(textView)
                 } catch (e: Exception) {
-                    Toast.makeText(activity, "브라우저를 찾지 못하였습니다", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this@PostActivity, "브라우저를 찾지 못하였습니다", Toast.LENGTH_SHORT).show()
                 }
             }
         }
     }
 
-    private fun viewInit(rootView: ViewGroup) {
-        postPublisherProfileImageView = rootView.findViewById(R.id.postPublisherProfileImageView)
-        postPublisherIdTextView = rootView.findViewById(R.id.postPublisherIdTextView)
-        postTitleTextView = rootView.findViewById(R.id.postTitleTextView)
-        postTwoLineDescriptionTextView = rootView.findViewById(R.id.postTwoLineDescriptionTextView)
-        postImagesSliderView = rootView.findViewById(R.id.postImagesSlider)
-        postDescriptionTextView = rootView.findViewById(R.id.postDescriptionTextView)
-        postUpdateNoteTextView = rootView.findViewById(R.id.postUpdateNoteTextView)
-        postImprovementTextView = rootView.findViewById(R.id.postImprovementTextView)
-        postLinksContainer = rootView.findViewById(R.id.postLinksContainer)
-        postCreatedDateTextView = rootView.findViewById(R.id.postCreatedDateTextView)
+    private fun viewInit() {
+        postPublisherProfileImageView = findViewById(R.id.postPublisherProfileImageView)
+        postPublisherIdTextView = findViewById(R.id.postPublisherIdTextView)
+        postTitleTextView = findViewById(R.id.postTitleTextView)
+        postTwoLineDescriptionTextView = findViewById(R.id.postTwoLineDescriptionTextView)
+        postImagesSliderView = findViewById(R.id.postImagesSlider)
+        postDescriptionTextView = findViewById(R.id.postDescriptionTextView)
+        postUpdateNoteTextView = findViewById(R.id.postUpdateNoteTextView)
+        postImprovementTextView = findViewById(R.id.postImprovementTextView)
+        postLinksContainer = findViewById(R.id.postLinksContainer)
+        postCreatedDateTextView = findViewById(R.id.postCreatedDateTextView)
     }
+
 }
