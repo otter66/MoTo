@@ -1,5 +1,6 @@
 package com.otter66.newMoTo.Fragment
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -19,6 +20,7 @@ import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
 import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.firestore.ktx.toObject
 import com.google.firebase.ktx.Firebase
 
 
@@ -61,6 +63,7 @@ class NoticeBoardFragment : Fragment() {
         postsUpdate()
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     private fun postsUpdate() {
         val collectionReferencePosts: CollectionReference = firebaseFirestore!!.collection("posts")
         val collectionReferenceUsers: CollectionReference = firebaseFirestore!!.collection("users")
@@ -70,22 +73,9 @@ class NoticeBoardFragment : Fragment() {
                     .addOnSuccessListener { documents ->
                         postList.clear()
                         for (document in documents) {
-                            postList.add(Post(
-                                    document.id,
-                                    document.data["title"].toString(),
-                                    document.data["twoLineDescription"].toString(),
-                                    document.data["mainImage"].toString(),
-                                    document.data["images"] as ArrayList<String?>,
-                                    document.data["description"].toString(),
-                                    document.data["update"].toString(),
-                                    document.data["improvement"].toString(),
-                                    document.data["linkNames"] as ArrayList<String?>,
-                                    document.data["linkAddresses"] as ArrayList<String?>,
-                                    document.data["publisher"].toString(),
-                                    document.getTimestamp("createdDate")?.toDate())
-                            )
+                            postList.add(document.toObject())
                         }
-                        //postListAdapter.notifyDataSetChanged()
+                        postListAdapter.notifyDataSetChanged()
                     }
                     .addOnFailureListener { exception ->
                         Toast.makeText(activity, "글을 가져오는데에 실패했습니다", Toast.LENGTH_SHORT).show()
@@ -95,20 +85,12 @@ class NoticeBoardFragment : Fragment() {
                     .addOnSuccessListener { documents ->
                         userList.clear()
                         for (document in documents) {
-                            userList.add(User(
-                                    document.data["id"].toString(),
-                                    document.data["job"].toString(),
-                                    document.data["group"].toString(),
-                                    document.data["department"].toString(),
-                                    document.data["profileImage"].toString())
-                            )
+                            userList.add(document.toObject())
                         }
-                        postListAdapter.notifyDataSetChanged()
                     }
                     .addOnFailureListener { exception ->
                         Toast.makeText(activity, "글을 가져오는데에 실패했습니다", Toast.LENGTH_SHORT).show()
                     }
-
             //postListAdapter.notifyDataSetChanged()
         }
     }

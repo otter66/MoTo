@@ -10,12 +10,10 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
-import com.google.firebase.firestore.DocumentReference
 import com.otter66.newMoTo.Activity.PostActivity
 import com.otter66.newMoTo.Data.Post
 import com.otter66.newMoTo.Data.User
 import com.otter66.newMoTo.R
-import com.otter66.newMoTo.Util.Util
 
 
 class MyPostListAdapter(var activity: Activity, private val currentUserPostList: ArrayList<Post>, private val currentUserInfo: User): RecyclerView.Adapter<MyPostListAdapter.ViewHolder>() {
@@ -31,8 +29,6 @@ class MyPostListAdapter(var activity: Activity, private val currentUserPostList:
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MyPostListAdapter.ViewHolder {
         val cardView = LayoutInflater.from(parent.context).inflate(R.layout.item_post, parent, false)
-        Log.d("test_log", "currentUser: ${currentUserInfo}")
-        Log.d("test_log", "currentUserPostList: ${currentUserPostList}")
         return ViewHolder(cardView)
     }
 
@@ -47,8 +43,12 @@ class MyPostListAdapter(var activity: Activity, private val currentUserPostList:
             holder.itemPostTwoLineDescriptionTextView.text = currentUserPostList[position].twoLineDescription ?: ""
 
             holder.itemView.setOnClickListener {
+                Log.d("test_log", "currentUserInfo(in Adapter): $currentUserInfo")
                 val intent = Intent(activity, PostActivity::class.java)
                 intent.putExtra("postInfo", currentUserPostList[holder.adapterPosition])
+                intent.putExtra(
+                    "publisherProfileImage",
+                    currentUserInfo.profileImage)
                 intent.putExtra("currentUserInfo", currentUserInfo)
                 activity.startActivity(intent)
             }

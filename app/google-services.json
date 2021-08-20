@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "1032341264527",
+    "project_id": "newmoto-8f49d",
+    "storage_bucket": "newmoto-8f49d.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1032341264527:android:b28d9fee686622e093b8fa",
+        "android_client_info": {
+          "package_name": "com.otter66.newMoTo"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1032341264527-9vqhgmcv7j6euqs8ppcjoqs18kckequq.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.otter66.newMoTo",
+            "certificate_hash": "8676b4725a2f9bd7e94e004ee04eda247aac2e66"
+          }
+        },
+        {
+          "client_id": "1032341264527-kdq9acfttjglb9nhhfllc425rns6sobs.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAS1tM9Rz49SnuZv1O_cRTP6Xi_NR0SzqY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1032341264527-kdq9acfttjglb9nhhfllc425rns6sobs.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

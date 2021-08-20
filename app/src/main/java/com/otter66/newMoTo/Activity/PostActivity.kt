@@ -50,7 +50,7 @@ class PostActivity: AppCompatActivity() {
         imagesList = mutableListOf()
         postInformation = intent.getSerializableExtra("postInfo") as Post
         publisherProfileImage = intent.getStringExtra("publisherProfileImage").toString()
-        currentUserInfo = intent.getStringExtra("currentUserInfo") as User?
+        currentUserInfo = intent.getSerializableExtra("currentUserInfo") as User?
         //todo 현재 유저의 정보와 글 퍼블리셔가 같으면 슬 수정, 삭제 가능하게
 
         viewInit()
@@ -75,8 +75,6 @@ class PostActivity: AppCompatActivity() {
         }
         //todo image의 형식인지 체크해주면 좋을 듯
         if(imagesList.size > 0 && imagesList[0] != "") postImagesSliderView.visibility = View.VISIBLE
-        Log.d("test_log", "imagesListSize: ${imagesList.size}")
-        Log.d("test_log", "imagesList: ${imagesList}")
         postSliderAdapter.notifyDataSetChanged()
         postDescriptionTextView.text = postInformation.description
         postUpdateNoteTextView.text = postInformation.update
