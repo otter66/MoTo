@@ -43,7 +43,7 @@ class MyPageFragment  : Fragment() {
 
     private lateinit var myPageProfileImageView: ImageView
     private lateinit var myPageUserIdTextView: TextView
-    private lateinit var goToModifyProfileButton: Button
+    //private lateinit var goToModifyProfileButton: Button //add later
     private lateinit var myPostListRecyclerView: RecyclerView
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
@@ -58,11 +58,10 @@ class MyPageFragment  : Fragment() {
             userDataInit()
 
             myPostListAdapter = MyPostListAdapter(activity as Activity, myPostList, currentUserInfo)
+            myPostListRecyclerView.setHasFixedSize(true)
             myPostListRecyclerView.layoutManager = LinearLayoutManager(activity)
             myPostListRecyclerView.adapter = myPostListAdapter
         }
-        myPostListRecyclerView.setHasFixedSize(true)
-        Log.d("test_log", "currentUserInfo(in Fragment onCreateView): $currentUserInfo")
 
         return rootView
     }
@@ -85,7 +84,6 @@ class MyPageFragment  : Fragment() {
                             myPostList.add(document.toObject())
                         }
                     }
-                    Log.d("test_log", "currentUserInfo(in Fragment myPostUpdate): $currentUserInfo")
                     myPostListAdapter.notifyDataSetChanged()
                 }
                 .addOnFailureListener { exception ->
@@ -98,8 +96,11 @@ class MyPageFragment  : Fragment() {
     private fun viewInit(rootView: ViewGroup) {
         myPageProfileImageView = rootView.findViewById(R.id.myPageProfileImageView)
         myPageUserIdTextView = rootView.findViewById(R.id.myPageUserIdTextView)
-        goToModifyProfileButton = rootView.findViewById(R.id.goToModifyProfileButton)
+        //goToModifyProfileButton = rootView.findViewById(R.id.goToModifyProfileButton)
         myPostListRecyclerView = rootView.findViewById(R.id.myPostListRecyclerView)
+
+        myPageProfileImageView.setOnClickListener(onClickListener)
+        //goToModifyProfileButton.setOnClickListener(onClickListener)
     }
 
     private suspend fun userDataInit() {
@@ -107,7 +108,7 @@ class MyPageFragment  : Fragment() {
             currentUserRef!!.get()
                 .addOnSuccessListener { document ->
                     currentUserInfo = document.toObject<User>()!!
-                    Glide.with(activity as Activity).load(currentUserInfo.profileImage).override(1000).circleCrop().into(myPageProfileImageView)
+                    Glide.with(activity as Activity).load(currentUserInfo.profileImage ?: R.drawable.sample_image).override(1000).circleCrop().into(myPageProfileImageView)
                     myPageUserIdTextView.text = currentUserInfo.id.toString()
                 }
                 .addOnFailureListener { exception ->
@@ -116,4 +117,13 @@ class MyPageFragment  : Fragment() {
                 .await()
         }
     }
+
+    private var onClickListener =
+        View.OnClickListener { v ->
+            when (v.id) {
+                R.id.myPageProfileImageView -> {
+                    //사진 가져오기
+                }
+            }
+        }
 }

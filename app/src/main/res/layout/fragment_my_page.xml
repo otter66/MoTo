@@ -34,6 +34,7 @@
 
             <Button
                 android:id="@+id/goToModifyProfileButton"
+                android:visibility="gone"
                 android:text="프로필 편집"
                 android:fontFamily="@font/bm_jua"
                 android:textSize="14sp"
@@ -46,14 +47,14 @@
     </LinearLayout>
 
     <ImageView
-        android:background="@color/gray"
+        android:background="@color/gray_shadow"
         android:layout_width="match_parent"
         android:layout_height="2dp"/>
 
-    <LinearLayout
+    <FrameLayout
         android:id="@+id/myPostContentLayout"
         android:orientation="vertical"
-        android:layout_marginTop="16dp"
+        android:paddingTop="16dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
@@ -63,6 +64,6 @@
             android:layout_height="wrap_content">
         </androidx.recyclerview.widget.RecyclerView>
 
-    </LinearLayout>
+    </FrameLayout>
 
 </LinearLayout>

@@ -11,5 +11,7 @@
     <color name="app_main_color_start">#FFDF00</color>
     <color name="app_main_color_end">#DC143C</color>
     <color name="blue">#005EFF</color>
-    <color name="gray">#8d8d8d</color>
+    <color name="gray_text">#8d8d8d</color>
+    <color name="gray_shadow">#D8D8D8</color>
+    <color name="orange">#F8AB2A</color>
 </resources>

@@ -4,6 +4,7 @@
     <option name="filePathToZoomLevelMap">
       <map>
         <entry key="app/src/main/res/drawable/bg_overlay.xml" value="0.14791666666666667" />
+        <entry key="app/src/main/res/drawable/ic_baseline_more_horiz_24.xml" value="0.2682051282051282" />
         <entry key="app/src/main/res/drawable/item_post_profile_background_ring.xml" value="0.27239583333333334" />
         <entry key="app/src/main/res/font/bm_jua.xml" value="0.2864583333333333" />
         <entry key="app/src/main/res/layout/activity_login.xml" value="0.20244565217391305" />

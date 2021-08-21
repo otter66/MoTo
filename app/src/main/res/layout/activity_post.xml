@@ -166,7 +166,7 @@
                 android:id="@+id/postCreatedDateTextView"
                 android:text="언제언제"
                 android:layout_marginTop="4dp"
-                android:textColor="@color/gray"
+                android:textColor="@color/gray_text"
                 android:textSize="15sp"
                 android:gravity="right"
                 android:fontFamily="@font/nanum_myeongjo"
