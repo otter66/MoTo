@@ -7,7 +7,7 @@ import androidx.core.text.set
 import androidx.core.text.toSpannable
 import com.otter66.newMoTo.R
 
-object Util {
+object TextUtil {
 
     fun setTextColor(activity:Activity, textView: TextView, text: String) {
         val gradientStarColor = ContextCompat.getColor(activity, R.color.app_main_color_start)

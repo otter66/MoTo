@@ -55,6 +55,8 @@ dependencies {
     implementation 'com.google.firebase:firebase-auth-ktx'
     implementation 'com.firebaseui:firebase-ui-auth:4.3.1'
     implementation 'com.google.android.gms:play-services-auth:19.2.0'
+    implementation platform('com.google.firebase:firebase-bom:28.3.0')
+    implementation 'com.google.firebase:firebase-storage'
 
     //noinspection LifecycleAnnotationProcessorWithJava8
     kapt "android.arch.lifecycle:compiler:1.1.1"

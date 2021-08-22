@@ -17,7 +17,7 @@ import com.otter66.newMoTo.Activity.PostActivity
 import com.otter66.newMoTo.Data.Post
 import com.otter66.newMoTo.R
 import com.otter66.newMoTo.Data.User
-import com.otter66.newMoTo.Util.Util
+import com.otter66.newMoTo.Util.TextUtil
 
 
 class PostListAdapter(var activity: Activity, private val postList: ArrayList<Post>, private val userList: ArrayList<User>): RecyclerView.Adapter<PostListAdapter.ViewHolder>() {
@@ -47,7 +47,7 @@ class PostListAdapter(var activity: Activity, private val postList: ArrayList<Po
         Glide.with(activity).load(publisherProfileImage ?: R.drawable.sample_image)
             .override(200, 200).circleCrop().into(holder.itemPostProfileImage)
         holder.itemPostUserIdTextView.text = postList[position].publisher ?: ""
-        Util.setTextColor(
+        TextUtil.setTextColor(
             activity,
             holder.itemPostUserIdTextView,
             postList[position].publisher ?: ""
