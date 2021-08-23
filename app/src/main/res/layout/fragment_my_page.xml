@@ -19,6 +19,7 @@
             android:layout_height="168dp"/>
 
         <FrameLayout
+            android:layout_marginTop="16dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
@@ -53,16 +54,24 @@
 
     <FrameLayout
         android:id="@+id/myPostContentLayout"
+        android:layout_weight="1"
         android:orientation="vertical"
         android:paddingTop="16dp"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="0dp">
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/myPostListRecyclerView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
         </androidx.recyclerview.widget.RecyclerView>
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:layout_gravity="bottom|right"
+            android:foreground="@drawable/ic_baseline_add_24"
+            android:backgroundTint="@color/orange"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
 
     </FrameLayout>
 

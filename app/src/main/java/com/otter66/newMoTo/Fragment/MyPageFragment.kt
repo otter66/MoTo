@@ -1,9 +1,12 @@
 package com.otter66.newMoTo.Fragment
 
+import android.Manifest
+import android.Manifest.permission.ACCESS_FINE_LOCATION
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.Activity.RESULT_OK
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -31,13 +34,15 @@ import com.otter66.newMoTo.Adapter.MyPostListAdapter
 import com.otter66.newMoTo.Data.Post
 import com.otter66.newMoTo.Data.User
 import com.otter66.newMoTo.R
-import com.otter66.newMoTo.Util.PermissionUtil.checkAndGetCameraPermission
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import android.net.Uri
-import android.util.Log
+import androidx.activity.result.ActivityResultLauncher
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import com.google.firebase.storage.FirebaseStorage
-import java.io.File
+import androidx.activity.result.ActivityResultCallback
+import androidx.activity.result.contract.ActivityResultContracts.RequestPermission
 
 
 class MyPageFragment  : Fragment() {
@@ -51,10 +56,15 @@ class MyPageFragment  : Fragment() {
 
     private lateinit var myPageProfileImageView: ImageView
     private lateinit var myPageUserIdTextView: TextView
+
     //private lateinit var goToModifyProfileButton: Button //add later
     private lateinit var myPostListRecyclerView: RecyclerView
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
         val rootView = inflater.inflate(R.layout.fragment_my_page, container, false) as ViewGroup
 
         db = Firebase.firestore
@@ -65,8 +75,9 @@ class MyPageFragment  : Fragment() {
             viewInit(rootView)
             userDataInit()
 
-            if(currentUserInfo != null) {
-                myPostListAdapter = MyPostListAdapter(activity as Activity, myPostList, currentUserInfo!!)
+            if (currentUserInfo != null) {
+                myPostListAdapter =
+                    MyPostListAdapter(activity as Activity, myPostList, currentUserInfo!!)
                 myPostListRecyclerView.setHasFixedSize(true)
                 myPostListRecyclerView.layoutManager = LinearLayoutManager(activity)
                 myPostListRecyclerView.adapter = myPostListAdapter
@@ -82,15 +93,39 @@ class MyPageFragment  : Fragment() {
         myPostUpdate()
     }
 
+    private var onClickListener =
+        View.OnClickListener { v ->
+            when (v.id) {
+                R.id.myPageProfileImageView -> {
+                    val permission = ContextCompat.checkSelfPermission(
+                        requireContext(), Manifest.permission.READ_EXTERNAL_STORAGE)
+
+                    if (permission == PackageManager.PERMISSION_GRANTED) {
+                        //todo 사진 가져오기
+                        val intent = Intent(Intent.ACTION_PICK)
+                        intent.setDataAndType(
+                            android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+                            "image/*"
+                        )
+                        setProfileImage.launch(intent)
+                    } else {
+                        //permissionsResultCallback.launch(Manifest.permission.READ_CONTACTS)
+                        permissionsResultCallback.launch(Manifest.permission.READ_EXTERNAL_STORAGE)
+                    }
+                }
+            }
+        }
+
     @SuppressLint("NotifyDataSetChanged")
     private fun myPostUpdate() {
         if (Firebase.auth.currentUser != null) {
-            val collectionReferencePosts: CollectionReference = Firebase.firestore.collection("posts")
+            val collectionReferencePosts: CollectionReference =
+                Firebase.firestore.collection("posts")
             collectionReferencePosts.orderBy("createdDate", Query.Direction.DESCENDING).get()
                 .addOnSuccessListener { documents ->
                     myPostList.clear()
                     for (document in documents) {
-                        if(document.data["publisher"].toString() == currentUserInfo?.id.toString()) {
+                        if (document.data["publisher"].toString() == currentUserInfo?.id.toString()) {
                             myPostList.add(document.toObject())
                         }
                     }
@@ -118,7 +153,9 @@ class MyPageFragment  : Fragment() {
             currentUserRef!!.get()
                 .addOnSuccessListener { document ->
                     currentUserInfo = document.toObject<User>()
-                    Glide.with(activity as Activity).load(currentUserInfo?.profileImage ?: R.drawable.sample_image).override(1000).circleCrop().into(myPageProfileImageView)
+                    Glide.with(activity as Activity)
+                        .load(currentUserInfo?.profileImage ?: R.drawable.sample_image)
+                        .override(1000).circleCrop().into(myPageProfileImageView)
                     myPageUserIdTextView.text = currentUserInfo?.id.toString()
                 }
                 .addOnFailureListener { exception ->
@@ -128,51 +165,66 @@ class MyPageFragment  : Fragment() {
         }
     }
 
-    private var onClickListener =
-        View.OnClickListener { v ->
-            when (v.id) {
-                R.id.myPageProfileImageView -> {
-                    if(checkAndGetCameraPermission(activity as Activity)) {
-                        //todo permission 얻어오는데 뭐가 문제가 있는걸까..
+    private var setProfileImage =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result: ActivityResult ->
+
+            if (result.resultCode == RESULT_OK && result.data?.data != null) {
+
+                val storageRef = FirebaseStorage.getInstance().reference
+                val currentUserProfileRef =
+                    storageRef.child("images/users/${user?.uid}/profileImage/${currentUserInfo?.id}ProfileImage")
+                val selectedImageUri: Uri = result.data?.data!!
+
+                //firebase storage에 등록해주고, user document의 profile을 수정해주고, user document에서 가져온 profile을 보여준다
+                val uploadTask = currentUserProfileRef.putFile(selectedImageUri)
+                uploadTask.addOnFailureListener {
+                    // Handle unsuccessful uploads
+                    Toast.makeText(activity, R.string.upload_fail, Toast.LENGTH_SHORT).show()
+                }.addOnSuccessListener { taskSnapshot ->
+                }.continueWithTask { task ->
+                    if (!task.isSuccessful) {
+                        task.exception?.let {
+                            throw it
+                        }
                     }
-                    //todo 사진 가져오기
-                    val intent = Intent(Intent.ACTION_PICK)
-                    intent.setDataAndType(android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI, "image/*");
-                    setProfileImageToGalleryImage.launch(intent)
+                    currentUserProfileRef.downloadUrl
+                }.addOnCompleteListener { task ->
+                    if (task.isSuccessful) {
+                        val downloadUri = task.result
+                        val newCurrentUserInfo = User(
+                            currentUserInfo?.id,
+                            currentUserInfo?.stateMessage,
+                            currentUserInfo?.job,
+                            currentUserInfo?.group,
+                            currentUserInfo?.department,
+                            downloadUri.toString()
+                        )
+
+                        currentUserRef?.set(newCurrentUserInfo)
+                            ?.addOnFailureListener {
+                                Toast.makeText(activity, R.string.upload_fail, Toast.LENGTH_SHORT)
+                                    .show()
+                            }
+                        Glide.with(activity as Activity).load(selectedImageUri).override(1000)
+                            .circleCrop().into(myPageProfileImageView)
+                    }
                 }
+
             }
         }
 
-    private var setProfileImageToGalleryImage = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
-        result: ActivityResult ->
-
-        if(result.resultCode == RESULT_OK && result.data?.data != null) {
-            val selectedImageUri: Uri = result.data?.data!!
-            val storageRef = FirebaseStorage.getInstance("gs://newmoto-8f49d.appspot.com/").reference
-            val userProfileRef = storageRef.child("images/users/${user?.uid}/profileImage/${selectedImageUri}")
-            val file: Uri = Uri.fromFile(File(selectedImageUri.toString()))
-            val uploadTask = userProfileRef.putFile(file)
-
-            //todo 웨..? 웨..... 웨 uploadTask error남..  dho . .. . .. . . ..,., ., ., .
-            uploadTask.addOnFailureListener {
-                // Handle unsuccessful uploads
-                Log.d("test_log", "uploadTask.addOnFailureListener")
-                Toast.makeText(activity, R.string.upload_fail, Toast.LENGTH_SHORT).show()
-            }.addOnSuccessListener { taskSnapshot ->
-                // taskSnapshot.metadata contains file metadata such as size, content-type, etc.
-                val newCurrentUserInfo = User(
-                    currentUserInfo?.id,
-                    currentUserInfo?.stateMessage,
-                    currentUserInfo?.job,
-                    currentUserInfo?.group,
-                    currentUserInfo?.department,
-                    userProfileRef.downloadUrl.toString()
+    private val permissionsResultCallback = registerForActivityResult(RequestPermission()){
+        when (it) {
+            true -> { val intent = Intent(Intent.ACTION_PICK)
+                intent.setDataAndType(
+                    android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+                    "image/*"
                 )
-                currentUserRef?.set(newCurrentUserInfo)
-                    ?.addOnFailureListener { Toast.makeText(activity, R.string.upload_fail, Toast.LENGTH_SHORT).show() }
-                Glide.with(activity as Activity).load(selectedImageUri).override(1000).circleCrop().into(myPageProfileImageView)
+                setProfileImage.launch(intent) }
+            false -> {
+                Toast.makeText(requireContext(), R.string.please_give_permission, Toast.LENGTH_SHORT).show()
             }
         }
     }
-
 }
+

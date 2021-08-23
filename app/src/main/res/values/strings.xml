@@ -3,4 +3,5 @@
     <string name="app_name2">Mo To</string>
 
     <string name="upload_fail">업로드에 실패했습니다</string>
+    <string name="please_give_permission">권한을 허용해주세요</string>
 </resources>
