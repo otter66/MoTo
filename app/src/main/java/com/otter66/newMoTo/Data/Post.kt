@@ -12,12 +12,12 @@ data class Post(
         val title: String? = null,
         val twoLineDescription: String? = null,
         val mainImage: String? = null,
-        val images: ArrayList<String?>? = null,
+        val images: ArrayList<String>? = null,
         val description: String? = null,
         val update: String? = null,
         val improvement: String? = null,
-        val linkNames: ArrayList<String?>? = null,
-        val linkAddresses: ArrayList<String?>? = null,
+        val linkNames: ArrayList<String>? = null,
+        val linkAddresses: ArrayList<String>? = null,
         val publisher: String? = null,
         val createdDate: Date? = null
 ) : Serializable

@@ -1,7 +1,6 @@
 package com.otter66.newMoTo.Fragment
 
 import android.Manifest
-import android.Manifest.permission.ACCESS_FINE_LOCATION
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.Activity.RESULT_OK
@@ -37,25 +36,25 @@ import com.otter66.newMoTo.R
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import android.net.Uri
-import androidx.activity.result.ActivityResultLauncher
-import androidx.core.app.ActivityCompat
+import android.widget.Button
 import androidx.core.content.ContextCompat
 import com.google.firebase.storage.FirebaseStorage
-import androidx.activity.result.ActivityResultCallback
 import androidx.activity.result.contract.ActivityResultContracts.RequestPermission
+import com.otter66.newMoTo.Activity.WritePostActivity
 
 
 class MyPageFragment  : Fragment() {
 
-    private lateinit var db: FirebaseFirestore
+    private var db: FirebaseFirestore? = null
     private var user: FirebaseUser? = null
     private var currentUserRef: DocumentReference? = null
-    private lateinit var myPostListAdapter: MyPostListAdapter
+    private var myPostListAdapter: MyPostListAdapter? = null
     private var currentUserInfo: User? = null
     private val myPostList: ArrayList<Post> = ArrayList()
 
     private lateinit var myPageProfileImageView: ImageView
     private lateinit var myPageUserIdTextView: TextView
+    private lateinit var goToWritePostButton: Button
 
     //private lateinit var goToModifyProfileButton: Button //add later
     private lateinit var myPostListRecyclerView: RecyclerView
@@ -69,7 +68,7 @@ class MyPageFragment  : Fragment() {
 
         db = Firebase.firestore
         user = Firebase.auth.currentUser
-        currentUserRef = db.collection("users").document(user!!.uid)
+        currentUserRef = db?.collection("users")?.document(user!!.uid)
 
         lifecycleScope.launch {
             viewInit(rootView)
@@ -113,6 +112,12 @@ class MyPageFragment  : Fragment() {
                         permissionsResultCallback.launch(Manifest.permission.READ_EXTERNAL_STORAGE)
                     }
                 }
+                R.id.goToWritePostButton -> {
+                    val intent = Intent(activity, WritePostActivity::class.java)
+                    //todo currentUserInfo가 null이면 어떻게 하는게 좋을까..?
+                    intent.putExtra("currentUserId",currentUserInfo?.id)
+                    startActivity(intent)
+                }
             }
         }
 
@@ -129,39 +134,40 @@ class MyPageFragment  : Fragment() {
                             myPostList.add(document.toObject())
                         }
                     }
-                    myPostListAdapter.notifyDataSetChanged()
+                    myPostListAdapter?.notifyDataSetChanged()
                 }
                 .addOnFailureListener { exception ->
                     Toast.makeText(activity, "글을 가져오지 못했습니다", Toast.LENGTH_SHORT).show()
                 }
-
         }
     }
 
     private fun viewInit(rootView: ViewGroup) {
         myPageProfileImageView = rootView.findViewById(R.id.myPageProfileImageView)
         myPageUserIdTextView = rootView.findViewById(R.id.myPageUserIdTextView)
+        goToWritePostButton = rootView.findViewById(R.id.goToWritePostButton)
         //goToModifyProfileButton = rootView.findViewById(R.id.goToModifyProfileButton)
         myPostListRecyclerView = rootView.findViewById(R.id.myPostListRecyclerView)
 
         myPageProfileImageView.setOnClickListener(onClickListener)
+        goToWritePostButton.setOnClickListener(onClickListener)
         //goToModifyProfileButton.setOnClickListener(onClickListener)
     }
 
     private suspend fun userDataInit() {
         if (Firebase.auth.currentUser != null) {
-            currentUserRef!!.get()
-                .addOnSuccessListener { document ->
+            currentUserRef?.get()
+                ?.addOnSuccessListener { document ->
                     currentUserInfo = document.toObject<User>()
                     Glide.with(activity as Activity)
                         .load(currentUserInfo?.profileImage ?: R.drawable.sample_image)
                         .override(1000).circleCrop().into(myPageProfileImageView)
                     myPageUserIdTextView.text = currentUserInfo?.id.toString()
                 }
-                .addOnFailureListener { exception ->
+                ?.addOnFailureListener { exception ->
                     Toast.makeText(activity, "정보를 가져오지 못했습니다", Toast.LENGTH_SHORT).show()
                 }
-                .await()
+                ?.await()
         }
     }
 
@@ -209,18 +215,19 @@ class MyPageFragment  : Fragment() {
                             .circleCrop().into(myPageProfileImageView)
                     }
                 }
-
             }
         }
 
     private val permissionsResultCallback = registerForActivityResult(RequestPermission()){
         when (it) {
-            true -> { val intent = Intent(Intent.ACTION_PICK)
+            true -> {
+                val intent = Intent(Intent.ACTION_PICK)
                 intent.setDataAndType(
                     android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
                     "image/*"
                 )
-                setProfileImage.launch(intent) }
+                setProfileImage.launch(intent)
+            }
             false -> {
                 Toast.makeText(requireContext(), R.string.please_give_permission, Toast.LENGTH_SHORT).show()
             }

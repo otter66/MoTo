@@ -1,81 +1,96 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
     <ScrollView
-        android:scrollbars="none"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
         <LinearLayout
-            android:id="@+id/postContentLayout"
             android:orientation="vertical"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
             <LinearLayout
+                android:padding="40dp"
                 android:orientation="vertical"
-                android:padding="16dp"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 
-                <LinearLayout
-                    android:orientation="horizontal"
-                    android:gravity="center"
+                <androidx.constraintlayout.widget.ConstraintLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content">
 
                     <ImageView
-                        android:id="@+id/postPublisherProfileImageView"
-                        android:background="@drawable/icon_otter"
-                        android:layout_width="40dp"
-                        android:layout_height="40dp"/>
-
-                    <TextView
-                        android:text="hello????"
-                        android:textColor="@color/black"
-                        android:textSize="20sp"
-                        android:id="@+id/postPublisherIdTextView"
-                        android:layout_marginLeft="8dp"
-                        android:fontFamily="@font/bm_jua"
+                        android:id="@+id/writePostMainImage"
+                        android:background="@color/gray_shadow"
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"/>
+                        android:layout_height="0dp"
+                        android:scaleType="centerCrop"
+                        app:layout_constraintDimensionRatio="W,1:1"
+                        tools:ignore="MissingConstraints" />
 
-                </LinearLayout>
+                </androidx.constraintlayout.widget.ConstraintLayout>
 
                 <TextView
-                    android:id="@+id/postTitleTextView"
+                    android:text="게시판에서 보이게 될 메인 이미지입니다"
+                    android:layout_marginTop="4dp"
+                    android:layout_gravity="right"
+                    android:fontFamily="@font/nanum_myeongjo"
+                    android:textColor="@color/gray_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
+
+            </LinearLayout>
+
+            <ImageView
+                android:background="@color/gray_shadow"
+                android:layout_width="match_parent"
+                android:layout_height="2dp"/>
+
+            <LinearLayout
+                android:layout_marginTop="16dp"
+                android:padding="16dp"
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <EditText
+                    android:id="@+id/writePostProjectTitleEditText"
                     android:fontFamily="@font/bm_jua"
                     android:textSize="28sp"
                     android:textColor="@color/black"
-                    android:text="project name"
-                    android:layout_marginTop="16dp"
+                    android:hint="@string/please_project_name"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"/>
 
-                <TextView
-                    android:id="@+id/postTwoLineDescriptionTextView"
+                <EditText
+                    android:id="@+id/writePostTwoLineDescriptionEditText"
                     android:fontFamily="@font/nanum_myeongjo"
                     android:textSize="15sp"
                     android:textColor="@color/black"
-                    android:text="project name"
+                    android:hint="@string/please_project_two_line_description"
                     android:layout_marginTop="12dp"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"/>
+
             </LinearLayout>
 
             <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="16dp"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 
                 <com.smarteist.autoimageslider.SliderView
-                    android:id="@+id/postImagesSlider"
+                    android:id="@+id/writePostImagesSlider"
                     android:layout_width="match_parent"
                     android:layout_height="0dp"
+                    android:background="@color/gray_shadow"
                     app:sliderIndicatorGravity="center_horizontal|bottom"
                     app:sliderIndicatorMargin="15dp"
                     app:sliderIndicatorOrientation="horizontal"
@@ -84,27 +99,33 @@
                     app:sliderIndicatorSelectedColor="#5A5A5A"
                     app:sliderIndicatorUnselectedColor="#FFF"
                     tools:ignore="MissingConstraints"
-                    app:layout_constraintDimensionRatio="W,1:1"
-                    android:visibility="gone"/>
+                    app:layout_constraintDimensionRatio="W,1:1" />
 
-                <!--        app:sliderIndicatorAnimationDuration="1000"-->
-                <!--        app:sliderAnimationDuration="1000"-->
-                <!--        app:sliderAutoCycleDirection="back_and_forth"-->
-                <!--        app:sliderAutoCycleEnabled="true"-->
-                <!--        app:sliderScrollTimeInSec="1"-->
-                <!--        app:sliderStartAutoCycle="true"-->
+                <com.google.android.material.floatingactionbutton.FloatingActionButton
+                    android:id="@+id/writePostImageAddFloatingButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:backgroundTint="@color/white"
+                    android:foreground="@drawable/ic_baseline_add_24"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintRight_toRightOf="parent"
+                    app:borderWidth="0dp"
+                    android:layout_marginBottom="16dp"
+                    android:layout_marginRight="16dp"
+                    tools:ignore="MissingConstraints" />
+
             </androidx.constraintlayout.widget.ConstraintLayout>
 
             <LinearLayout
-                android:orientation="vertical"
+                android:layout_marginTop="16dp"
                 android:padding="16dp"
+                android:orientation="vertical"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 
-                <TextView
-                    android:id="@+id/postDescriptionTextView"
-                    android:text="description "
-                    android:layout_marginTop="8dp"
+                <EditText
+                    android:id="@+id/writePostDescriptionEditText"
+                    android:hint="@string/please_project_description"
                     android:textColor="@color/black"
                     android:textSize="15sp"
                     android:fontFamily="@font/nanum_myeongjo"
@@ -120,10 +141,9 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"/>
 
-                <TextView
-                    android:id="@+id/postUpdateNoteTextView"
-                    android:text="update note 헬로"
-                    android:layout_marginTop="4dp"
+                <EditText
+                    android:id="@+id/writePostUpdateNoteEditText"
+                    android:hint="@string/please_project_update_note"
                     android:textColor="@color/black"
                     android:textSize="15sp"
                     android:fontFamily="@font/nanum_myeongjo"
@@ -139,10 +159,9 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"/>
 
-                <TextView
-                    android:id="@+id/postImprovementTextView"
-                    android:text="개선사항"
-                    android:layout_marginTop="4dp"
+                <EditText
+                    android:id="@+id/writePostImprovementEditText"
+                    android:hint="@string/please_project_improvement"
                     android:textColor="@color/black"
                     android:textSize="15sp"
                     android:fontFamily="@font/nanum_myeongjo"
@@ -150,7 +169,7 @@
                     android:layout_height="wrap_content"/>
 
                 <TextView
-                    android:text="관련 링크"
+                    android:text="@string/related_link"
                     android:layout_marginTop="16dp"
                     android:textColor="@color/black"
                     android:textSize="20sp"
@@ -159,7 +178,7 @@
                     android:layout_height="wrap_content"/>
 
                 <LinearLayout
-                    android:id="@+id/postLinksContainer"
+                    android:id="@+id/writePostRelatedLinkContentLayout"
                     android:orientation="vertical"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content">
@@ -167,15 +186,22 @@
                 </LinearLayout>
 
                 <TextView
-                    android:id="@+id/postCreatedDateTextView"
-                    android:text="언제언제"
-                    android:layout_marginTop="4dp"
-                    android:textColor="@color/gray_text"
-                    android:textSize="15sp"
-                    android:gravity="right"
+                    android:id="@+id/addRelatedLinkButton"
                     android:fontFamily="@font/nanum_myeongjo"
-                    android:layout_width="match_parent"
+                    android:text="@string/add_related_link"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"/>
+
+                <Button
+                    android:id="@+id/submitPost"
+                    android:layout_gravity="right"
+                    android:fontFamily="@font/bm_jua"
+                    android:textColor="@color/black"
+                    android:text="작성 완료"
+                    android:backgroundTint="@color/orange"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
+
             </LinearLayout>
 
         </LinearLayout>

@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="match_parent">
 
     <LinearLayout
         android:padding="24dp"
@@ -18,45 +18,56 @@
             android:layout_width="168dp"
             android:layout_height="168dp"/>
 
-        <FrameLayout
+
+        <TextView
+            android:id="@+id/myPageUserIdTextView"
+            android:textSize="24sp"
+            android:textColor="@color/black"
+            android:fontFamily="@font/bm_jua"
+            android:gravity="center"
+            android:layout_marginTop="16dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+
+        <LinearLayout
+            android:orientation="horizontal"
             android:layout_marginTop="16dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
-            <TextView
-                android:id="@+id/myPageUserIdTextView"
-                android:textSize="24sp"
-                android:textColor="@color/black"
+            <Button
+                android:id="@+id/goToWritePostButton"
+                android:text="글쓰기"
                 android:fontFamily="@font/bm_jua"
-                android:layout_gravity="center"
-                android:gravity="center"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"/>
+                android:textSize="14sp"
+                android:layout_weight="1"
+                android:layout_width="0dp"
+                android:layout_height="40dp"/>
 
             <Button
+                android:layout_weight="1"
                 android:id="@+id/goToModifyProfileButton"
                 android:visibility="gone"
                 android:text="프로필 편집"
                 android:fontFamily="@font/bm_jua"
                 android:textSize="14sp"
-                android:layout_width="wrap_content"
-                android:layout_height="38dp"
-                android:layout_gravity="right|bottom"/>
+                android:layout_width="0dp"
+                android:layout_height="40dp" />
 
-        </FrameLayout>
+        </LinearLayout>
 
     </LinearLayout>
 
     <ImageView
         android:background="@color/gray_shadow"
         android:layout_width="match_parent"
-        android:layout_height="2dp"/>
+        android:layout_height="2dp"
+        android:layout_marginBottom="16dp"/>
 
     <FrameLayout
         android:id="@+id/myPostContentLayout"
         android:layout_weight="1"
         android:orientation="vertical"
-        android:paddingTop="16dp"
         android:layout_width="match_parent"
         android:layout_height="0dp">
 
@@ -65,13 +76,6 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
         </androidx.recyclerview.widget.RecyclerView>
-
-        <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:layout_gravity="bottom|right"
-            android:foreground="@drawable/ic_baseline_add_24"
-            android:backgroundTint="@color/orange"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
 
     </FrameLayout>
 
