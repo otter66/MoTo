@@ -186,6 +186,7 @@
                 </LinearLayout>
 
                 <TextView
+                    android:layout_marginTop="8dp"
                     android:id="@+id/addRelatedLinkButton"
                     android:fontFamily="@font/nanum_myeongjo"
                     android:text="@string/add_related_link"

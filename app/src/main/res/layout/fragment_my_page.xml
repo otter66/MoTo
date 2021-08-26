@@ -1,82 +1,86 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
+<androidx.core.widget.NestedScrollView
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="wrap_content">
 
     <LinearLayout
-        android:padding="24dp"
         android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center">
-
-        <ImageView
-            android:id="@+id/myPageProfileImageView"
-            android:layout_width="168dp"
-            android:layout_height="168dp"/>
-
-
-        <TextView
-            android:id="@+id/myPageUserIdTextView"
-            android:textSize="24sp"
-            android:textColor="@color/black"
-            android:fontFamily="@font/bm_jua"
-            android:gravity="center"
-            android:layout_marginTop="16dp"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"/>
+        android:layout_height="match_parent">
 
         <LinearLayout
-            android:orientation="horizontal"
-            android:layout_marginTop="16dp"
+            android:padding="24dp"
+            android:orientation="vertical"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:gravity="center">
 
-            <Button
-                android:id="@+id/goToWritePostButton"
-                android:text="글쓰기"
-                android:fontFamily="@font/bm_jua"
-                android:textSize="14sp"
-                android:layout_weight="1"
-                android:layout_width="0dp"
-                android:layout_height="40dp"/>
+            <ImageView
+                android:id="@+id/myPageProfileImageView"
+                android:layout_width="168dp"
+                android:layout_height="168dp"/>
 
-            <Button
-                android:layout_weight="1"
-                android:id="@+id/goToModifyProfileButton"
-                android:visibility="gone"
-                android:text="프로필 편집"
+
+            <TextView
+                android:id="@+id/myPageUserIdTextView"
+                android:textSize="24sp"
+                android:textColor="@color/black"
                 android:fontFamily="@font/bm_jua"
-                android:textSize="14sp"
-                android:layout_width="0dp"
-                android:layout_height="40dp" />
+                android:gravity="center"
+                android:layout_marginTop="16dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
+
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_marginTop="16dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <Button
+                    android:id="@+id/goToWritePostButton"
+                    android:text="글쓰기"
+                    android:fontFamily="@font/bm_jua"
+                    android:textSize="14sp"
+                    android:layout_weight="1"
+                    android:layout_width="0dp"
+                    android:layout_height="40dp"/>
+
+                <Button
+                    android:layout_weight="1"
+                    android:id="@+id/goToModifyProfileButton"
+                    android:visibility="gone"
+                    android:text="프로필 편집"
+                    android:fontFamily="@font/bm_jua"
+                    android:textSize="14sp"
+                    android:layout_width="0dp"
+                    android:layout_height="40dp" />
+
+            </LinearLayout>
 
         </LinearLayout>
 
-    </LinearLayout>
-
-    <ImageView
-        android:background="@color/gray_shadow"
-        android:layout_width="match_parent"
-        android:layout_height="2dp"
-        android:layout_marginBottom="16dp"/>
-
-    <FrameLayout
-        android:id="@+id/myPostContentLayout"
-        android:layout_weight="1"
-        android:orientation="vertical"
-        android:layout_width="match_parent"
-        android:layout_height="0dp">
-
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/myPostListRecyclerView"
+        <ImageView
+            android:background="@color/gray_shadow"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-        </androidx.recyclerview.widget.RecyclerView>
+            android:layout_height="2dp"
+            android:layout_marginBottom="16dp"/>
 
-    </FrameLayout>
+        <FrameLayout
+            android:id="@+id/myPostContentLayout"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="0dp">
 
-</LinearLayout>
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/myPostListRecyclerView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+            </androidx.recyclerview.widget.RecyclerView>
+
+        </FrameLayout>
+
+    </LinearLayout>
+</androidx.core.widget.NestedScrollView>

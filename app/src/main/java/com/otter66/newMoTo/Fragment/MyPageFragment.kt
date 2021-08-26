@@ -159,10 +159,12 @@ class MyPageFragment  : Fragment() {
             currentUserRef?.get()
                 ?.addOnSuccessListener { document ->
                     currentUserInfo = document.toObject<User>()
-                    Glide.with(activity as Activity)
-                        .load(currentUserInfo?.profileImage ?: R.drawable.sample_image)
-                        .override(1000).circleCrop().into(myPageProfileImageView)
-                    myPageUserIdTextView.text = currentUserInfo?.id.toString()
+                    if(activity != null) {
+                        Glide.with(activity as Activity)
+                            .load(currentUserInfo?.profileImage ?: R.drawable.sample_image)
+                            .override(1000).circleCrop().into(myPageProfileImageView)
+                        myPageUserIdTextView.text = currentUserInfo?.id.toString()
+                    }
                 }
                 ?.addOnFailureListener { exception ->
                     Toast.makeText(activity, "정보를 가져오지 못했습니다", Toast.LENGTH_SHORT).show()
@@ -184,7 +186,6 @@ class MyPageFragment  : Fragment() {
                 //firebase storage에 등록해주고, user document의 profile을 수정해주고, user document에서 가져온 profile을 보여준다
                 val uploadTask = currentUserProfileRef.putFile(selectedImageUri)
                 uploadTask.addOnFailureListener {
-                    // Handle unsuccessful uploads
                     Toast.makeText(activity, R.string.upload_fail, Toast.LENGTH_SHORT).show()
                 }.addOnSuccessListener { taskSnapshot ->
                 }.continueWithTask { task ->
