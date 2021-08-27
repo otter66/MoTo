@@ -16,8 +16,8 @@ data class Post(
     val description: String? = null,
     val update: String? = null,
     val improvement: String? = null,
-    val linkNames: ArrayList<String>? = null,
-    val linkAddresses: ArrayList<String>? = null,
+    var linkNames: ArrayList<String>? = null,
+    var linkAddresses: ArrayList<String>? = null,
     val publisher: String? = null,
     val createdDate: Date? = null
 ) : Serializable

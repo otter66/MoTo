@@ -32,8 +32,8 @@ class WritePostActivity: AppCompatActivity() {
     private var backKeyPressedTime: Long = 0
     private var mainImage: Uri? = null
     private var images: ArrayList<String>? = null
-    private var relatedLinkNames: ArrayList<String>? = null
-    private var relatedLinkAddresses: ArrayList<String>? = null
+    private var relatedLinkNames: MutableList<String> = mutableListOf()
+    private var relatedLinkAddresses: MutableList<String> = mutableListOf()
     private var currentUserId: String? = null
     private var postDatabase: CollectionReference? = null
     private var postData: Post? = null
@@ -50,6 +50,8 @@ class WritePostActivity: AppCompatActivity() {
     private lateinit var writePostRelatedLinkContentLayout: LinearLayout
     private lateinit var submitPost: TextView
     private lateinit var addRelatedLinkButton: TextView
+    private val linkNameEditTexts: MutableList<EditText> = mutableListOf()
+    private var linkAddressEditTexts: MutableList<EditText> = mutableListOf()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -85,6 +87,7 @@ class WritePostActivity: AppCompatActivity() {
         }
 
     private fun uploadPost() {
+        setRelatedLinks()
         postData = Post(
             null,
             writePostProjectTitleEditText.text?.toString(),
@@ -94,12 +97,11 @@ class WritePostActivity: AppCompatActivity() {
             writePostDescriptionEditText.text?.toString(),
             writePostUpdateNoteEditText.text?.toString(),
             writePostImprovementEditText.text?.toString(),
-            relatedLinkNames,
-            relatedLinkAddresses,
+            relatedLinkNames as ArrayList<String>,
+            relatedLinkAddresses as ArrayList<String>,
             currentUserId,
             Date(System.currentTimeMillis())
         )
-        //todo image는 storage에
 
         val storageRef = FirebaseStorage.getInstance().reference
 
@@ -144,6 +146,16 @@ class WritePostActivity: AppCompatActivity() {
         }
     }
 
+    private fun setRelatedLinks() {
+        for(i in 0 until relatedLinksCount) {
+            if(linkNameEditTexts[i].text != null && linkNameEditTexts[i].text.toString() != ""
+                && linkAddressEditTexts[i].text != null && linkAddressEditTexts[i].text.toString() != "")  {
+                relatedLinkNames.add(linkNameEditTexts[i].text.toString())
+                relatedLinkAddresses.add(linkAddressEditTexts[i].text.toString())
+            }
+        }
+    }
+
     private fun viewInit() {
         writePostMainImage = findViewById(R.id.writePostMainImage)
         writePostProjectTitleEditText = findViewById(R.id.writePostProjectTitleEditText)
@@ -174,24 +186,23 @@ class WritePostActivity: AppCompatActivity() {
         )
         linkAddressParams.setMargins(0, 0, 0, 15)
 
-        //todo 여기여기여기!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! 링크입력했을 때만 추가추가, ET에서 어떻게 text 가져올거?
-        val linkNameEditText: EditText = EditText(this@WritePostActivity)
-        val linkAddressEditText: EditText = EditText(this@WritePostActivity)
-        linkNameEditText.id = relatedLinksCount
-        linkAddressEditText.id = relatedLinksCount
-        linkNameEditText.layoutParams = linkNameParams
-        linkAddressEditText.layoutParams = linkAddressParams
-        linkNameEditText.hint = getString(R.string.please_related_link_name)
-        linkAddressEditText.hint = getString(R.string.please_related_link_address)
-        linkNameEditText.setTextColor(getColor(R.color.black))
-        linkAddressEditText.setTextColor(getColor(R.color.black))
-        linkNameEditText.textSize = 15f
-        linkAddressEditText.textSize = 15f
+        //todo 여기여기여기!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        linkNameEditTexts.add(EditText(this@WritePostActivity))
+        linkAddressEditTexts.add(EditText(this@WritePostActivity))
+//        linkNameEditTexts[relatedLinksCount].id = relatedLinksCount
+//        linkAddressEditTexts[relatedLinksCount].id = relatedLinksCount //리스트로 해주면 id 필요 없겠지?
+        linkNameEditTexts[relatedLinksCount].layoutParams = linkNameParams
+        linkAddressEditTexts[relatedLinksCount].layoutParams = linkAddressParams
+        linkNameEditTexts[relatedLinksCount].hint = getString(R.string.please_related_link_name)
+        linkAddressEditTexts[relatedLinksCount].hint = getString(R.string.please_related_link_address)
+        linkNameEditTexts[relatedLinksCount].setTextColor(getColor(R.color.black))
+        linkAddressEditTexts[relatedLinksCount].setTextColor(getColor(R.color.black))
+        linkNameEditTexts[relatedLinksCount].textSize = 15f
+        linkAddressEditTexts[relatedLinksCount].textSize = 15f
         //linkNameEditText.typeface = getFont(this, R.font.nanum_myeongjo)
 
-
-        writePostRelatedLinkContentLayout.addView(linkNameEditText)
-        writePostRelatedLinkContentLayout.addView(linkAddressEditText)
+        writePostRelatedLinkContentLayout.addView(linkNameEditTexts[relatedLinksCount])
+        writePostRelatedLinkContentLayout.addView(linkAddressEditTexts[relatedLinksCount])
         relatedLinksCount++
     }
 
