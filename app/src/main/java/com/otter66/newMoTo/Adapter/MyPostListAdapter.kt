@@ -8,6 +8,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.appcompat.content.res.AppCompatResources
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.otter66.newMoTo.Activity.PostActivity
@@ -35,8 +36,11 @@ class MyPostListAdapter(var activity: Activity, private val currentUserPostList:
     override fun onBindViewHolder(holder: MyPostListAdapter.ViewHolder, position: Int) {
         //게시글 item에 post 정보 연결
         if(currentUserPostList.size > 0) {
-            Glide.with(activity).load(currentUserPostList[position].mainImage ?: R.drawable.sample_image)
-                .override(1000).thumbnail(0.1f).into(holder.itemPostMainImage)
+            if(currentUserPostList[position].mainImage?.contains("http") == true) {
+                //일반 사진들은 멀쩡한데 null일 때 가영이가 너무 부담스럽게 확대대서 나와서 이렇게 해줌.. sample 이미지를 바꾸던가 해야지 원.. 가영이의 저주인가..
+                Glide.with(activity).load(currentUserPostList[position].mainImage)
+                    .override(1000).thumbnail(0.1f).into(holder.itemPostMainImage)
+            }
             holder.itemPostProfileImage.visibility = View.GONE
             holder.itemPostProfileBackground.visibility = View.GONE
             holder.itemPostTitleTextView.text = currentUserPostList[position].title ?: ""

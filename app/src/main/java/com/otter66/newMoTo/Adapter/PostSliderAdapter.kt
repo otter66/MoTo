@@ -40,6 +40,24 @@ class PostSliderAdapter(private val context: Context, private val mSliderItems: 
     override fun getCount(): Int {
         return mSliderItems.size
     }
+
+    fun deleteItem(position: Int) {
+        mSliderItems.removeAt(position)
+        notifyDataSetChanged()
+    }
+
+    fun modifyItem(position: Int, sliderItem: String) {
+        mSliderItems[position] = sliderItem
+        notifyDataSetChanged()
+    }
+
+    fun addItems(sliderItems: ArrayList<String>) {
+        for(i in 0 until sliderItems.size) {
+            mSliderItems.add(sliderItems[i])
+        }
+        notifyDataSetChanged()
+    }
+
 }
 
 //https://github.com/smarteist/Android-Image-Slider

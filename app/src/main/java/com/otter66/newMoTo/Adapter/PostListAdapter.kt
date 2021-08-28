@@ -2,12 +2,14 @@ package com.otter66.newMoTo.Adapter
 
 import android.app.Activity
 import android.content.Intent
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
+import androidx.appcompat.content.res.AppCompatResources.getDrawable
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.google.firebase.auth.ktx.auth
@@ -39,8 +41,10 @@ class PostListAdapter(var activity: Activity, private val postList: ArrayList<Po
     override fun onBindViewHolder(holder: PostListAdapter.ViewHolder, position: Int) {
         val publisherProfileImage = getPublisherProfileImage(postList[position].publisher)
 
+        Log.d("test_log", "postList[$position]: ${postList[position]}")
+
         //게시글 item에 post 정보 연결
-        if(postList[position].mainImage != null) {
+        if(postList[position].mainImage?.contains("http") == true) {
             //일반 사진들은 멀쩡한데 null일 때 가영이가 너무 부담스럽게 확대대서 나와서 이렇게 해줌.. sample 이미지를 바꾸던가 해야지 원.. 가영이의 저주인가..
             Glide.with(activity).load(postList[position].mainImage)
                 .override(1000).thumbnail(0.1f).into(holder.itemPostMainImage)
@@ -57,7 +61,6 @@ class PostListAdapter(var activity: Activity, private val postList: ArrayList<Po
         )
         holder.itemPostTitleTextView.text = postList[position].title ?: ""
         holder.itemPostTwoLineDescriptionTextView.text = postList[position].twoLineDescription ?: ""
-
 
         holder.itemView.setOnClickListener {
             val intent = Intent(activity, PostActivity::class.java)

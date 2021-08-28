@@ -59,7 +59,7 @@ class PostActivity: AppCompatActivity() {
 
         setPostInformation()
 
-        }
+    }
 
     private fun setPostInformation() {
         Glide.with(this@PostActivity).load(publisherProfileImage ?: R.drawable.sample_image)
@@ -68,13 +68,14 @@ class PostActivity: AppCompatActivity() {
         postTitleTextView.text = postInformation.title
         postTwoLineDescriptionTextView.text = postInformation.twoLineDescription
         postImagesSliderView.setSliderAdapter(postSliderAdapter)
-        if(postInformation.images != null) {
-            for(i in 0 until postInformation.images!!.size) {
-                imagesList.add(postInformation.images!![i]!!)
+        if (postInformation.images != null) {
+            for (i in 0 until postInformation.images!!.size) {
+                imagesList.add(postInformation.images!![i])
             }
         }
         //todo image의 형식인지 체크해주면 좋을 듯
-        if(imagesList.size > 0 && imagesList[0] != "") postImagesSliderView.visibility = View.VISIBLE
+        if (imagesList.size > 0 && imagesList[0] != "") postImagesSliderView.visibility =
+            View.VISIBLE
         postSliderAdapter.notifyDataSetChanged()
         postDescriptionTextView.text = postInformation.description
         postUpdateNoteTextView.text = postInformation.update
