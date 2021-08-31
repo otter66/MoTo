@@ -1,10 +1,13 @@
 package com.otter66.newMoTo.Activity
 
 import android.Manifest
+import android.content.ClipData
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
+import android.provider.MediaStore
 import android.util.Log
 import android.view.View
 import android.widget.*
@@ -27,6 +30,9 @@ import com.otter66.newMoTo.R
 import com.smarteist.autoimageslider.SliderView
 import java.util.*
 import kotlin.collections.ArrayList
+import androidx.core.app.ActivityCompat.startActivityForResult
+import java.lang.Exception
+
 
 class WritePostActivity: AppCompatActivity() {
 
@@ -39,13 +45,13 @@ class WritePostActivity: AppCompatActivity() {
     private var postDatabase: CollectionReference? = null
     private var postData: Post? = null
     private var relatedLinksCount: Int = 0
-    private lateinit var postSliderAdapter: PostSliderAdapter
+    private lateinit var postImagesSliderAdapter: PostSliderAdapter
 
     private lateinit var writePostMainImage: ImageView
     private lateinit var writePostProjectTitleEditText: EditText
     private lateinit var writePostTwoLineDescriptionEditText: EditText
     private lateinit var writePostImagesSlider: SliderView
-    private lateinit var writePostImageAddFloatingButton: FloatingActionButton
+    //private lateinit var writePostImageAddFloatingButton: FloatingActionButton
     private lateinit var writePostDescriptionEditText: EditText
     private lateinit var writePostUpdateNoteEditText: EditText
     private lateinit var writePostImprovementEditText: EditText
@@ -63,18 +69,18 @@ class WritePostActivity: AppCompatActivity() {
 
         currentUserId = intent.getStringExtra("currentUserId")
         postDatabase = Firebase.firestore.collection("posts")
-        postSliderAdapter = PostSliderAdapter(this@WritePostActivity, images)
-        writePostImagesSlider.setSliderAdapter(postSliderAdapter)
+        postImagesSliderAdapter = PostSliderAdapter(this@WritePostActivity, images)
+        writePostImagesSlider.setSliderAdapter(postImagesSliderAdapter)
 
 
-
-        //todo images slider
+        //todo images slider ok, images upload
     }
 
     override fun onBackPressed() {
         if (System.currentTimeMillis() > backKeyPressedTime + 2000) {
             backKeyPressedTime = System.currentTimeMillis()
-            Toast.makeText(this, R.string.back_pressed_prevent_in_write_post, Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, R.string.back_pressed_prevent_in_write_post, Toast.LENGTH_SHORT)
+                .show()
             return
         } else {
             //super.onBackPressed()
@@ -88,11 +94,13 @@ class WritePostActivity: AppCompatActivity() {
                 R.id.writePostMainImage -> getMainImage()
                 R.id.submitPost -> uploadPost()
                 R.id.addRelatedLinkButton -> addRelatedLink()
+                //R.id.writePostImageAddFloatingButton -> getSliderImages()
+                R.id.writePostImagesSlider -> getSliderImages()
             }
         }
 
     private fun uploadPost() {
-        setRelatedLinks()
+        getRelatedLinks()
         postData = Post(
             null,
             writePostProjectTitleEditText.text?.toString(),
@@ -111,8 +119,7 @@ class WritePostActivity: AppCompatActivity() {
         val storageRef = FirebaseStorage.getInstance().reference
 
         //글 새로 작성할 때
-        postDatabase?.add(postData!!)?.
-        addOnSuccessListener { currentPostDoc ->
+        postDatabase?.add(postData!!)?.addOnSuccessListener { currentPostDoc ->
             uploadMainImage(storageRef, currentPostDoc)
 
             finish()
@@ -124,10 +131,11 @@ class WritePostActivity: AppCompatActivity() {
     private fun uploadMainImage(storageRef: StorageReference, currentPostDoc: DocumentReference?) {
         val currentPostMainImageRef =
             storageRef.child("images/posts/${currentPostDoc}/mainImage")
-        if(mainImage != null) {
+        if (mainImage != null) {
             val uploadTask = currentPostMainImageRef.putFile(mainImage!!)
             uploadTask.addOnFailureListener {
-                Toast.makeText(this@WritePostActivity, R.string.upload_fail, Toast.LENGTH_SHORT).show()
+                Toast.makeText(this@WritePostActivity, R.string.upload_fail, Toast.LENGTH_SHORT)
+                    .show()
             }.addOnSuccessListener {
             }.continueWithTask { task ->
                 if (!task.isSuccessful) {
@@ -137,24 +145,27 @@ class WritePostActivity: AppCompatActivity() {
                 }
                 currentPostMainImageRef.downloadUrl
             }.addOnCompleteListener { task ->
-                if(task.isSuccessful) {
+                if (task.isSuccessful) {
                     val mainImageDownloadUri = task.result
                     postData?.mainImage = mainImageDownloadUri.toString()
 
-                    currentPostDoc?.set(postData!!)?.
-                    addOnFailureListener {
-                        Toast.makeText(this@WritePostActivity, R.string.upload_fail, Toast.LENGTH_SHORT)
-                            .show()
+                    currentPostDoc?.set(postData!!)?.addOnFailureListener {
+                        Toast.makeText(
+                            this@WritePostActivity,
+                            R.string.upload_fail,
+                            Toast.LENGTH_SHORT
+                        ).show()
                     }
                 }
             }
         }
     }
 
-    private fun setRelatedLinks() {
-        for(i in 0 until relatedLinksCount) {
-            if(linkNameEditTexts[i].text != null && linkNameEditTexts[i].text.toString() != ""
-                && linkAddressEditTexts[i].text != null && linkAddressEditTexts[i].text.toString() != "")  {
+    private fun getRelatedLinks() {
+        for (i in 0 until relatedLinksCount) {
+            if (linkNameEditTexts[i].text != null && linkNameEditTexts[i].text.toString() != ""
+                && linkAddressEditTexts[i].text != null && linkAddressEditTexts[i].text.toString() != ""
+            ) {
                 relatedLinkNames.add(linkNameEditTexts[i].text.toString())
                 relatedLinkAddresses.add(linkAddressEditTexts[i].text.toString())
             }
@@ -166,7 +177,7 @@ class WritePostActivity: AppCompatActivity() {
         writePostProjectTitleEditText = findViewById(R.id.writePostProjectTitleEditText)
         writePostTwoLineDescriptionEditText = findViewById(R.id.writePostTwoLineDescriptionEditText)
         writePostImagesSlider = findViewById(R.id.writePostImagesSlider)
-        writePostImageAddFloatingButton = findViewById(R.id.writePostImageAddFloatingButton)
+        //writePostImageAddFloatingButton = findViewById(R.id.writePostImageAddFloatingButton)
         writePostDescriptionEditText = findViewById(R.id.writePostDescriptionEditText)
         writePostUpdateNoteEditText = findViewById(R.id.writePostUpdateNoteEditText)
         writePostImprovementEditText = findViewById(R.id.writePostImprovementEditText)
@@ -175,27 +186,31 @@ class WritePostActivity: AppCompatActivity() {
         submitPost = findViewById(R.id.submitPost)
 
         writePostMainImage.setOnClickListener(onClickListener)
-        submitPost.setOnClickListener(onClickListener)
+        //writePostImageAddFloatingButton.setOnClickListener(onClickListener)
+        writePostImagesSlider.setOnClickListener(onClickListener)
         addRelatedLinkButton.setOnClickListener(onClickListener)
+        submitPost.setOnClickListener(onClickListener)
     }
 
+    //todo link delete시 문제있음
     private fun addRelatedLink() {
         val linkContainer = LinearLayout(this@WritePostActivity)
-        linkContainer.layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)
+        linkContainer.layoutParams =
+            LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)
         linkContainer.orientation = LinearLayout.VERTICAL
 
         val linkNameAndDeleteContainer = LinearLayout(this@WritePostActivity)
-        linkNameAndDeleteContainer.layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)
+        linkNameAndDeleteContainer.layoutParams =
+            LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)
         linkNameAndDeleteContainer.orientation = LinearLayout.HORIZONTAL
 
         val linkDeleteButton = ImageView(this@WritePostActivity)
-        linkDeleteButton.layoutParams = LayoutParams(40, 40)
+        linkDeleteButton.layoutParams = LayoutParams(80, 80)
         linkDeleteButton.setImageDrawable(getDrawable(R.drawable.ic_baseline_delete_forever_24))
         linkDeleteButton.id = relatedLinksCount
 
         val linkNameParams: LayoutParams = LayoutParams(
-            0,
-            LayoutParams.WRAP_CONTENT
+            0, LayoutParams.WRAP_CONTENT
         ).apply { weight = 1f }
         linkNameParams.setMargins(0, 15, 0, 0)
         val linkAddressParams: LayoutParams = LayoutParams(
@@ -204,13 +219,13 @@ class WritePostActivity: AppCompatActivity() {
         )
         linkAddressParams.setMargins(0, 0, 0, 20)
 
-        //todo 지우는 기능 추가 필요 (에타에 있는 것처럼 하고싶은데...오케하지..)
         linkNameEditTexts.add(EditText(this@WritePostActivity))
         linkAddressEditTexts.add(EditText(this@WritePostActivity))
         linkNameEditTexts[relatedLinksCount].layoutParams = linkNameParams
         linkAddressEditTexts[relatedLinksCount].layoutParams = linkAddressParams
         linkNameEditTexts[relatedLinksCount].hint = getString(R.string.please_related_link_name)
-        linkAddressEditTexts[relatedLinksCount].hint = getString(R.string.please_related_link_address)
+        linkAddressEditTexts[relatedLinksCount].hint =
+            getString(R.string.please_related_link_address)
         linkNameEditTexts[relatedLinksCount].setTextColor(getColor(R.color.black))
         linkAddressEditTexts[relatedLinksCount].setTextColor(getColor(R.color.black))
         linkNameEditTexts[relatedLinksCount].textSize = 15f
@@ -225,10 +240,8 @@ class WritePostActivity: AppCompatActivity() {
 
         linkDeleteButton.setOnClickListener {
             //id를 쓰면 삭제하면 삭제된 id는 공석이겠지..?가 아니고 id는 자동으로관리되는구만.. 근데 맨 뒤에꺼는 안당겨지는 것 같다..?
-            Log.d("test_log", "linkDeleteButton.id: ${linkDeleteButton.id}")
-            Log.d("test_log", "relatedLinksCount: $relatedLinksCount")
             val deletePosition = linkDeleteButton.id
-            if(deletePosition < relatedLinksCount) {
+            if (deletePosition < relatedLinksCount) {
                 linkNameEditTexts.removeAt(deletePosition)
                 linkAddressEditTexts.removeAt(deletePosition)
                 relatedLinksCount--
@@ -244,10 +257,9 @@ class WritePostActivity: AppCompatActivity() {
 
     private fun getMainImage() { //저장소 권한이 있는지 확인한 후 이미지 가져옴
         val permission = ContextCompat.checkSelfPermission(
-            this@WritePostActivity, Manifest.permission.READ_EXTERNAL_STORAGE)
-
+            this@WritePostActivity, Manifest.permission.READ_EXTERNAL_STORAGE
+        )
         if (permission == PackageManager.PERMISSION_GRANTED) {
-            //사진 가져오기
             val intent = Intent(Intent.ACTION_PICK)
             intent.setDataAndType(
                 android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
@@ -269,12 +281,61 @@ class WritePostActivity: AppCompatActivity() {
             }
         }
 
-    private val permissionsResultCallback = registerForActivityResult(ActivityResultContracts.RequestPermission()){
-        when (it) {
-            true -> { }
-            false -> {
-                Toast.makeText(this@WritePostActivity, R.string.please_give_permission, Toast.LENGTH_SHORT).show()
-            }
+    private fun getSliderImages() {
+        val permission = ContextCompat.checkSelfPermission(
+            this@WritePostActivity, Manifest.permission.READ_EXTERNAL_STORAGE
+        )
+        if (permission == PackageManager.PERMISSION_GRANTED) {
+            val intent = Intent()
+            intent.setDataAndType(
+                MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+                "image/*"
+            )
+            intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true)
+            intent.action = Intent.ACTION_GET_CONTENT
+            setSliderImages.launch(intent)
+            Toast.makeText(this, "사진을 꾹 눌러 여러장 선택이 가능합니다", Toast.LENGTH_SHORT).show()
+
+        } else {
+            permissionsResultCallback.launch(Manifest.permission.READ_EXTERNAL_STORAGE)
         }
     }
+
+    private val setSliderImages =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result: ActivityResult ->
+            if (result.resultCode == RESULT_OK && result.data?.clipData != null) {
+                val clipData: ClipData? = result.data?.clipData
+                if(clipData != null) {
+                    if(clipData.itemCount > 10) {
+                        Toast.makeText(this, R.string.notice_max_images_count, Toast.LENGTH_SHORT).show()
+                    } else {
+                        if(images.count() > 0) {
+                            images = mutableListOf()
+                        } else {
+                            for(i in 0 until clipData.itemCount) {
+                                Log.d("test_log", "clipData.getItemAt(i).uri: ${clipData.getItemAt(i).uri}")
+                                images.add(clipData.getItemAt(i).uri.toString())
+                            }
+                            Log.d("test_log", "images (in setSliderImages): $images")
+                            postImagesSliderAdapter.notifyDataSetChanged()
+                        }
+                    }
+                }
+            }
+        }
+
+    private val permissionsResultCallback =
+        registerForActivityResult(ActivityResultContracts.RequestPermission()) {
+            when (it) {
+                true -> {
+                }
+                false -> {
+                    Toast.makeText(
+                        this@WritePostActivity,
+                        R.string.please_give_permission,
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+            }
+        }
 }

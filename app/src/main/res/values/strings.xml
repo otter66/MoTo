@@ -19,5 +19,8 @@
     <string name="please_related_link_name">어떤 링크인가요?</string>
     <string name="please_related_link_address">http까지 포함한 링크 주소를 알려주세요</string>
     <string name="add_related_link">링크 추가</string>
+    
+    
+    <string name="notice_max_images_count">사진은 10장까지 선택 가능합니다</string>
 
 </resources>

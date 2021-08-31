@@ -2,6 +2,7 @@ package com.otter66.newMoTo.Adapter
 
 import com.otter66.newMoTo.R
 import android.content.Context
+import android.util.Log
 
 import android.view.LayoutInflater
 import android.view.View
@@ -10,6 +11,7 @@ import android.widget.ImageView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.request.RequestOptions
+import com.otter66.newMoTo.Activity.WritePostActivity
 import com.smarteist.autoimageslider.SliderViewAdapter
 
 class PostSliderAdapter(private val context: Context, private val mSliderItems: MutableList<String>) :
@@ -27,6 +29,7 @@ class PostSliderAdapter(private val context: Context, private val mSliderItems: 
     }
 
     override fun onBindViewHolder(viewHolder: SliderAdapterVH, position: Int) {
+        Log.d("test_log", "images (in Adapter): $mSliderItems")
         val sliderItem: String = mSliderItems[position]
         Glide.with(viewHolder.itemView)
             .load(sliderItem)
@@ -40,24 +43,6 @@ class PostSliderAdapter(private val context: Context, private val mSliderItems: 
     override fun getCount(): Int {
         return mSliderItems.size
     }
-
-    fun deleteItem(position: Int) {
-        mSliderItems.removeAt(position)
-        notifyDataSetChanged()
-    }
-
-    fun modifyItem(position: Int, sliderItem: String) {
-        mSliderItems[position] = sliderItem
-        notifyDataSetChanged()
-    }
-
-    fun addItems(sliderItems: ArrayList<String>) {
-        for(i in 0 until sliderItems.size) {
-            mSliderItems.add(sliderItems[i])
-        }
-        notifyDataSetChanged()
-    }
-
 }
 
 //https://github.com/smarteist/Android-Image-Slider

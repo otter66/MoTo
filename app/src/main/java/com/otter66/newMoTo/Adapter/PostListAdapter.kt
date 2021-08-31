@@ -2,14 +2,12 @@ package com.otter66.newMoTo.Adapter
 
 import android.app.Activity
 import android.content.Intent
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
-import androidx.appcompat.content.res.AppCompatResources.getDrawable
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.google.firebase.auth.ktx.auth
@@ -40,8 +38,6 @@ class PostListAdapter(var activity: Activity, private val postList: ArrayList<Po
 
     override fun onBindViewHolder(holder: PostListAdapter.ViewHolder, position: Int) {
         val publisherProfileImage = getPublisherProfileImage(postList[position].publisher)
-
-        Log.d("test_log", "postList[$position]: ${postList[position]}")
 
         //게시글 item에 post 정보 연결
         if(postList[position].mainImage?.contains("http") == true) {
@@ -106,5 +102,9 @@ class PostListAdapter(var activity: Activity, private val postList: ArrayList<Po
             }
         }
         return null
+    }
+
+    override fun getItemViewType(position: Int): Int {
+        return position
     }
 }

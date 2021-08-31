@@ -58,7 +58,6 @@ class PostActivity: AppCompatActivity() {
         postSliderAdapter = PostSliderAdapter(this@PostActivity, imagesList)
 
         setPostInformation()
-
     }
 
     private fun setPostInformation() {
@@ -83,7 +82,6 @@ class PostActivity: AppCompatActivity() {
         createLinkBundle()
         postCreatedDateTextView.text =
             SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(postInformation.createdDate)
-
     }
 
     private fun createLinkBundle() {

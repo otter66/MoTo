@@ -62,4 +62,8 @@ class MyPostListAdapter(var activity: Activity, private val currentUserPostList:
     override fun getItemCount(): Int {
         return currentUserPostList.size
     }
+
+    override fun getItemViewType(position: Int): Int {
+        return position
+    }
 }
