@@ -4,6 +4,7 @@
 
     <string name="image_load_fail">사진을 가져오는데 실패했습니다</string>
     <string name="upload_fail">업로드에 실패했습니다</string>
+    <string name="upload_success">게시글이 업로드되었습니다</string>
     <string name="please_give_permission">권한을 허용해주세요</string>
     <string name="back_pressed_prevent_in_write_post">작성중인 글은 저장되지 않습니다</string>
 

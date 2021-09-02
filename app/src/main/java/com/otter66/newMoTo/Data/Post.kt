@@ -12,7 +12,7 @@ data class Post(
     val title: String? = null,
     val twoLineDescription: String? = null,
     var mainImage: String? = null,
-    val images: ArrayList<String>? = null,
+    var images: ArrayList<String>? = null,
     val description: String? = null,
     val update: String? = null,
     val improvement: String? = null,

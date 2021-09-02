@@ -5,7 +5,6 @@ import android.content.ClipData
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
-import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
 import android.util.Log
@@ -16,8 +15,8 @@ import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import androidx.core.net.toUri
 import com.bumptech.glide.Glide
-import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.ktx.firestore
@@ -28,10 +27,10 @@ import com.otter66.newMoTo.Adapter.PostSliderAdapter
 import com.otter66.newMoTo.Data.Post
 import com.otter66.newMoTo.R
 import com.smarteist.autoimageslider.SliderView
+import java.io.File
+import java.lang.reflect.Array
 import java.util.*
 import kotlin.collections.ArrayList
-import androidx.core.app.ActivityCompat.startActivityForResult
-import java.lang.Exception
 
 
 class WritePostActivity: AppCompatActivity() {
@@ -39,6 +38,7 @@ class WritePostActivity: AppCompatActivity() {
     private var backKeyPressedTime: Long = 0
     private var mainImage: Uri? = null
     private var images: MutableList<String> = mutableListOf()
+    private var imagesUri: MutableList<Uri> = mutableListOf()
     private var relatedLinkNames: MutableList<String> = mutableListOf()
     private var relatedLinkAddresses: MutableList<String> = mutableListOf()
     private var currentUserId: String? = null
@@ -72,8 +72,8 @@ class WritePostActivity: AppCompatActivity() {
         postImagesSliderAdapter = PostSliderAdapter(this@WritePostActivity, images)
         writePostImagesSlider.setSliderAdapter(postImagesSliderAdapter)
 
-
-        //todo images slider ok, images upload
+        //todo adapter에서 item으로 만들었기 때문에 item 클릭시 이벤트로 해줘야하는 것 같다..
+        Toast.makeText(this, "제 실력이 미천하여 사진들은 선택 후 수정이 불가합니다", Toast.LENGTH_SHORT).show()
     }
 
     override fun onBackPressed() {
@@ -120,7 +120,7 @@ class WritePostActivity: AppCompatActivity() {
 
         //글 새로 작성할 때
         postDatabase?.add(postData!!)?.addOnSuccessListener { currentPostDoc ->
-            uploadMainImage(storageRef, currentPostDoc)
+            uploadImages(storageRef, currentPostDoc)
 
             finish()
         }?.addOnFailureListener {
@@ -128,15 +128,16 @@ class WritePostActivity: AppCompatActivity() {
         }
     }
 
-    private fun uploadMainImage(storageRef: StorageReference, currentPostDoc: DocumentReference?) {
+    private fun uploadImages(storageRef: StorageReference, currentPostDoc: DocumentReference?) {
+
+        //todo main Image Upload
         val currentPostMainImageRef =
-            storageRef.child("images/posts/${currentPostDoc}/mainImage")
+            storageRef.child("images/posts/${currentPostDoc?.id}/mainImage")
         if (mainImage != null) {
             val uploadTask = currentPostMainImageRef.putFile(mainImage!!)
             uploadTask.addOnFailureListener {
                 Toast.makeText(this@WritePostActivity, R.string.upload_fail, Toast.LENGTH_SHORT)
                     .show()
-            }.addOnSuccessListener {
             }.continueWithTask { task ->
                 if (!task.isSuccessful) {
                     task.exception?.let {
@@ -155,6 +156,48 @@ class WritePostActivity: AppCompatActivity() {
                             R.string.upload_fail,
                             Toast.LENGTH_SHORT
                         ).show()
+                    }
+                }
+            }
+        }
+
+        //todo slider Images Upload
+        if (imagesUri.size != 0) {
+            val imagesDownloadUriTmp = arrayListOf<String>()
+            for(i in 0 until imagesUri.size) {
+                val currentPostImagesRef =
+                    storageRef.child("images/posts/${currentPostDoc?.id}/images$i")
+                val uploadTask = currentPostImagesRef.putFile(imagesUri[i])
+                uploadTask.addOnFailureListener {
+                    Toast.makeText(this@WritePostActivity, R.string.upload_fail, Toast.LENGTH_SHORT)
+                        .show()
+                }.continueWithTask { task ->
+                    if (!task.isSuccessful) {
+                        task.exception?.let {
+                            throw it
+                        }
+                    }
+                    currentPostImagesRef.downloadUrl
+                }.addOnCompleteListener { task ->
+                    if (task.isSuccessful) {
+                        imagesDownloadUriTmp.add(task.result.toString())
+                        if(i == imagesUri.size - 1) {
+                            postData?.images = imagesDownloadUriTmp
+                            currentPostDoc?.set(postData!!)
+                                ?.addOnFailureListener {
+                                Toast.makeText(
+                                    this@WritePostActivity,
+                                    R.string.upload_fail,
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            }?.addOnSuccessListener {
+                                    Toast.makeText(
+                                        this@WritePostActivity,
+                                        R.string.upload_success,
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                            }
+                        }
                     }
                 }
             }
@@ -294,7 +337,7 @@ class WritePostActivity: AppCompatActivity() {
             intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true)
             intent.action = Intent.ACTION_GET_CONTENT
             setSliderImages.launch(intent)
-            Toast.makeText(this, "사진을 꾹 눌러 여러장 선택이 가능합니다", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, "사진을 꾹 눌러주세요", Toast.LENGTH_SHORT).show()
 
         } else {
             permissionsResultCallback.launch(Manifest.permission.READ_EXTERNAL_STORAGE)
@@ -311,12 +354,12 @@ class WritePostActivity: AppCompatActivity() {
                     } else {
                         if(images.count() > 0) {
                             images = mutableListOf()
+                            imagesUri = mutableListOf()
                         } else {
                             for(i in 0 until clipData.itemCount) {
-                                Log.d("test_log", "clipData.getItemAt(i).uri: ${clipData.getItemAt(i).uri}")
                                 images.add(clipData.getItemAt(i).uri.toString())
+                                imagesUri.add(clipData.getItemAt(i).uri)
                             }
-                            Log.d("test_log", "images (in setSliderImages): $images")
                             postImagesSliderAdapter.notifyDataSetChanged()
                         }
                     }

@@ -47,7 +47,6 @@ class MyPostListAdapter(var activity: Activity, private val currentUserPostList:
             holder.itemPostTwoLineDescriptionTextView.text = currentUserPostList[position].twoLineDescription ?: ""
 
             holder.itemView.setOnClickListener {
-                Log.d("test_log", "currentUserInfo(in Adapter): $currentUserInfo")
                 val intent = Intent(activity, PostActivity::class.java)
                 intent.putExtra("postInfo", currentUserPostList[holder.adapterPosition])
                 intent.putExtra(
