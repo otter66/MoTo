@@ -70,17 +70,15 @@ class MyPageFragment  : Fragment() {
         user = Firebase.auth.currentUser
         currentUserRef = db?.collection("users")?.document(user!!.uid)
 
-        lifecycleScope.launch {
-            viewInit(rootView)
-            userDataInit()
+        viewInit(rootView)
+        userDataInit()
 
-            if (currentUserInfo != null) {
-                myPostListAdapter =
-                    MyPostListAdapter(activity as Activity, myPostList, currentUserInfo!!)
-                myPostListRecyclerView.setHasFixedSize(true)
-                myPostListRecyclerView.layoutManager = LinearLayoutManager(activity)
-                myPostListRecyclerView.adapter = myPostListAdapter
-            }
+        if (currentUserInfo != null) {
+            myPostListAdapter =
+                MyPostListAdapter(activity as Activity, myPostList, currentUserInfo!!)
+            myPostListRecyclerView.setHasFixedSize(true)
+            myPostListRecyclerView.layoutManager = LinearLayoutManager(activity)
+            myPostListRecyclerView.adapter = myPostListAdapter
         }
 
         return rootView
@@ -154,22 +152,13 @@ class MyPageFragment  : Fragment() {
         //goToModifyProfileButton.setOnClickListener(onClickListener)
     }
 
-    private suspend fun userDataInit() {
-        if (Firebase.auth.currentUser != null) {
-            currentUserRef?.get()
-                ?.addOnSuccessListener { document ->
-                    currentUserInfo = document.toObject<User>()
-                    if(activity != null) {
-                        Glide.with(activity as Activity)
-                            .load(currentUserInfo?.profileImage ?: R.drawable.sample_image)
-                            .override(1000).circleCrop().into(myPageProfileImageView)
-                        myPageUserIdTextView.text = currentUserInfo?.id.toString()
-                    }
-                }
-                ?.addOnFailureListener { exception ->
-                    Toast.makeText(activity, "정보를 가져오지 못했습니다", Toast.LENGTH_SHORT).show()
-                }
-                ?.await()
+    private fun userDataInit() {
+        currentUserInfo = arguments?.getSerializable("currentUserInfo") as User?
+        if(activity != null) {
+            Glide.with(activity as Activity)
+                .load(currentUserInfo?.profileImage ?: R.drawable.sample_image)
+                .override(1000).circleCrop().into(myPageProfileImageView)
+            myPageUserIdTextView.text = currentUserInfo?.id.toString()
         }
     }
 

@@ -5,21 +5,27 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
+import android.view.LayoutInflater
+import android.view.Menu
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
-import android.widget.LinearLayout
-import android.widget.TextView
-import android.widget.Toast
+import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
+import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
+import com.google.firebase.auth.FirebaseUser
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.firestore.ktx.toObject
+import com.google.firebase.ktx.Firebase
 import com.otter66.newMoTo.Adapter.PostSliderAdapter
 import com.otter66.newMoTo.Data.Post
 import com.otter66.newMoTo.Data.User
 import com.otter66.newMoTo.R
 import com.smarteist.autoimageslider.SliderView
+import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -31,6 +37,7 @@ class PostActivity: AppCompatActivity() {
     private lateinit var postSliderAdapter: PostSliderAdapter
     private lateinit var imagesList: MutableList<String>
 
+    private lateinit var toolbar: androidx.appcompat.widget.Toolbar
     private lateinit var postPublisherProfileImageView: ImageView
     private lateinit var postPublisherIdTextView: TextView
     private lateinit var postTitleTextView: TextView
@@ -46,18 +53,29 @@ class PostActivity: AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_post)
 
-
         imagesList = mutableListOf()
         postInformation = intent.getSerializableExtra("postInfo") as Post
         publisherProfileImage = intent.getStringExtra("publisherProfileImage").toString()
         currentUserInfo = intent.getSerializableExtra("currentUserInfo") as User?
-        //todo 현재 유저의 정보와 글 퍼블리셔가 같으면 슬 수정, 삭제 가능하게
 
         viewInit()
 
-        postSliderAdapter = PostSliderAdapter(this@PostActivity, imagesList)
+        //todo 현재 유저의 정보와 글 퍼블리셔가 같으면 슬 수정, 삭제 가능하게
 
+        postSliderAdapter = PostSliderAdapter(this@PostActivity, imagesList)
+        setSupportActionBar(toolbar)
         setPostInformation()
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.post_menu, menu)
+        Log.d("test_log", "currentUserInfo.id: ${currentUserInfo?.id}, postInformation.publisher: ${postInformation.publisher}")
+        if(currentUserInfo?.id.toString() == postInformation.publisher.toString()) {
+            Log.d("test_log", "currentUserInfo?.id == postInformation.publisher")
+            menu?.add(Menu.NONE, Menu.FIRST + 0, Menu.NONE, "수정")
+            menu?.add(Menu.NONE, Menu.FIRST + 1, Menu.NONE, "삭제")
+        }
+        return super.onCreateOptionsMenu(menu)
     }
 
     private fun setPostInformation() {
@@ -119,6 +137,7 @@ class PostActivity: AppCompatActivity() {
     }
 
     private fun viewInit() {
+        toolbar = findViewById(R.id.contentToolbar)
         postPublisherProfileImageView = findViewById(R.id.postPublisherProfileImageView)
         postPublisherIdTextView = findViewById(R.id.postPublisherIdTextView)
         postTitleTextView = findViewById(R.id.postTitleTextView)

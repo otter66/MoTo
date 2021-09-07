@@ -20,7 +20,7 @@ import com.otter66.newMoTo.Data.User
 import com.otter66.newMoTo.Util.TextUtil
 
 
-class PostListAdapter(var activity: Activity, private val postList: ArrayList<Post>, private val userList: ArrayList<User>): RecyclerView.Adapter<PostListAdapter.ViewHolder>() {
+class PostListAdapter(var activity: Activity, private val postList: ArrayList<Post>, private val userList: ArrayList<User>, private val currentUserInfo: User?): RecyclerView.Adapter<PostListAdapter.ViewHolder>() {
     inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val itemPostMainImage: ImageView = itemView.findViewById(R.id.itemPostMainImage)
         val itemPostProfileImage: ImageView = itemView.findViewById(R.id.itemPostProfileImage)
@@ -64,7 +64,7 @@ class PostListAdapter(var activity: Activity, private val postList: ArrayList<Po
             intent.putExtra(
                 "publisherProfileImage",
                 getPublisherProfileImage(postList[holder.adapterPosition].publisher))
-            intent.putExtra("currentUserInfo", getCurrentUserInfo())
+            intent.putExtra("currentUserInfo", currentUserInfo)
             activity.startActivity(intent)
         }
     }

@@ -10,12 +10,17 @@ import com.google.firebase.auth.ktx.auth
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
 import com.google.firebase.firestore.ktx.firestore
 import com.otter66.newMoTo.Fragment.MyPageFragment
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.FirebaseFirestore
 import com.otter66.newMoTo.Fragment.NoticeBoardFragment
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.google.firebase.firestore.ktx.toObject
+import com.otter66.newMoTo.Data.User
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
 
 class MainActivity : AppCompatActivity() {
 
@@ -23,6 +28,7 @@ class MainActivity : AppCompatActivity() {
     private var user: FirebaseUser? = null
     private var db: FirebaseFirestore? = null
     private var currentUserRef: DocumentReference? = null
+    private var currentUserInfo: User? = null
 
     private lateinit var bottomNavigationView: BottomNavigationView
 
@@ -30,34 +36,48 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        //로그인
-        auth = Firebase.auth
-        user = Firebase.auth.currentUser
-        db = Firebase.firestore
-        if (user != null) currentUserRef = db?.collection("users")?.document(user!!.uid)
-        if(loginCheck()) {
-            firstLoginCheck()
+        lifecycleScope.launch {
+            //로그인
+            auth = Firebase.auth
+            user = Firebase.auth.currentUser
+            db = Firebase.firestore
+            if (user != null) currentUserRef = db?.collection("users")?.document(user!!.uid)
+            if(loginCheck()) {
+                if(!firstLoginCheck()) {
+                    db?.collection("users")?.document(user!!.uid)?.get()?.addOnSuccessListener { documentSnapshot ->
+                        currentUserInfo = documentSnapshot.toObject<User>()
+                    }?.await()
+                    //todo dkdkdkdkkk await 달아줬는데도 왜 왜그러는거야
+
+                    //버튼 이벤트 연결
+                    bottomNavigationView = findViewById(R.id.bottomNavigationView)
+                    bottomNavigationView.setOnItemSelectedListener(onItemSelectedListener)
+
+                    // bottom navigation menu 아이콘을 커스텀하기 위해 기존 tint null
+                    bottomNavigationView.itemIconTintList = null
+                    supportFragmentManager.beginTransaction() .replace(R.id.contentLayout, NoticeBoardFragment()) .commit()
+                }
+            }
         }
-
-        //버튼 이벤트 연결
-        bottomNavigationView = findViewById(R.id.bottomNavigationView)
-        bottomNavigationView.setOnItemSelectedListener(onItemSelectedListener)
-
-        // bottom navigation menu 아이콘을 커스텀하기 위해 기존 tint null
-        bottomNavigationView.itemIconTintList = null
-
-        supportFragmentManager.beginTransaction() .replace(R.id.contentLayout, NoticeBoardFragment()) .commit()
     }
 
     private var onItemSelectedListener: BottomNavigationView.OnNavigationItemSelectedListener
     = BottomNavigationView.OnNavigationItemSelectedListener {
         when (it.itemId) {
             R.id.homePageItem -> {
-                supportFragmentManager.beginTransaction() .replace(R.id.contentLayout, NoticeBoardFragment()) .commit()
+                val fragment = NoticeBoardFragment()
+                val bundle = Bundle()
+                bundle.putSerializable("currentUserInfo", currentUserInfo)
+                fragment.arguments = bundle
+                supportFragmentManager.beginTransaction() .replace(R.id.contentLayout, fragment) .commit()
                 true
             }
             R.id.myPageItem -> {
-                supportFragmentManager.beginTransaction() .replace(R.id.contentLayout, MyPageFragment()) .commit()
+                val fragment = MyPageFragment()
+                val bundle = Bundle()
+                bundle.putSerializable("currentUserInfo", currentUserInfo)
+                fragment.arguments = bundle
+                supportFragmentManager.beginTransaction() .replace(R.id.contentLayout, fragment) .commit()
                 true
             }
             else -> {
@@ -74,22 +94,27 @@ class MainActivity : AppCompatActivity() {
         return true
     }
 
-    private fun firstLoginCheck() {
+    private fun firstLoginCheck(): Boolean {
         var documentReference: DocumentReference? = null
+        var returnValue: Boolean = false
 
         if(user != null) documentReference = db?.collection("users")?.document(user!!.uid)
         documentReference?.get()
             ?.addOnSuccessListener { document ->
                 if (document.data?.get("id") != null) {
+                    returnValue = true
                     Log.d("firstLogin", "DocumentSnapshot data: ${document.data}")
                 } else {
+                    returnValue = false
                     Log.d("firstLogin", "No such document")
                     turnActivity(FirstLoginActivity::class.java)
                 }
             }
             ?.addOnFailureListener { exception ->
+                returnValue = false
                 Log.d("firstLogin", "get failed with ", exception)
             }
+        return returnValue
     }
 
     private fun turnActivity(c: Class<*>) {

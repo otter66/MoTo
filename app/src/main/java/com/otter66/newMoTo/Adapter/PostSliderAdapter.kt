@@ -24,7 +24,6 @@ class PostSliderAdapter(private val context: Context, private val mSliderItems: 
     override fun onCreateViewHolder(parent: ViewGroup): SliderAdapterVH {
         val inflate = LayoutInflater.from(parent.context)
             .inflate(R.layout.item_image_slider_layout, parent, false)
-        Log.d("test_log", "images (in Adapter): $mSliderItems")
 
         return SliderAdapterVH(inflate)
     }

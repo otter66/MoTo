@@ -3,6 +3,7 @@ package com.otter66.newMoTo.Fragment
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -26,10 +27,11 @@ import com.google.firebase.ktx.Firebase
 
 class NoticeBoardFragment : Fragment() {
 
-    var firebaseFirestore: FirebaseFirestore? = null
+    var db: FirebaseFirestore? = null
     private lateinit var postListAdapter: PostListAdapter
     private lateinit var postList: ArrayList<Post>
     private lateinit var userList: ArrayList<User>
+    private var currentUserInfo: User? = null
 
     private lateinit var postListRecyclerView: RecyclerView
     private lateinit var itemPostUserIdTextView: TextView
@@ -37,9 +39,11 @@ class NoticeBoardFragment : Fragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
 
-        firebaseFirestore = Firebase.firestore
+        db = Firebase.firestore
         postList = ArrayList()
         userList = ArrayList()
+
+       currentUserInfo = arguments?.getSerializable("currentUserInfo") as User?
 
         val rootView = inflater.inflate(R.layout.fragment_notice_board, container, false) as ViewGroup
 
@@ -48,7 +52,7 @@ class NoticeBoardFragment : Fragment() {
         itemPostUserIdTextView = (inflater.inflate(R.layout.item_post, container, false) as ViewGroup)
                 .findViewById(R.id.itemPostUserIdTextView)
         postListRecyclerView.setHasFixedSize(true)
-        postListAdapter = PostListAdapter(activity as Activity, postList, userList)
+        postListAdapter = PostListAdapter(activity as Activity, postList, userList, currentUserInfo)
         postListRecyclerView.layoutManager = LinearLayoutManager(activity)
         postListRecyclerView.adapter = postListAdapter
         postsUpdate()
@@ -65,8 +69,8 @@ class NoticeBoardFragment : Fragment() {
 
     @SuppressLint("NotifyDataSetChanged")
     private fun postsUpdate() {
-        val collectionReferencePosts: CollectionReference = firebaseFirestore!!.collection("posts")
-        val collectionReferenceUsers: CollectionReference = firebaseFirestore!!.collection("users")
+        val collectionReferencePosts: CollectionReference = db!!.collection("posts")
+        val collectionReferenceUsers: CollectionReference = db!!.collection("users")
 
         if (Firebase.auth.currentUser != null) {
             collectionReferencePosts.orderBy("createdDate", Query.Direction.DESCENDING).get()
