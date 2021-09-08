@@ -120,9 +120,12 @@ class WritePostActivity: AppCompatActivity() {
 
         //글 새로 작성할 때
         postDatabase?.add(postData!!)?.addOnSuccessListener { currentPostDoc ->
-            uploadImages(storageRef, currentPostDoc)
-
-            finish()
+            currentPostDoc.update("id", currentPostDoc.id)
+                .addOnSuccessListener {
+                    uploadImages(storageRef, currentPostDoc)
+                    //todo id 안올라가면 게시글도 안올라가게
+                    finish()
+                }.addOnFailureListener { }
         }?.addOnFailureListener {
             Toast.makeText(this@WritePostActivity, R.string.upload_fail, Toast.LENGTH_SHORT).show()
         }
@@ -149,8 +152,7 @@ class WritePostActivity: AppCompatActivity() {
                 if (task.isSuccessful) {
                     val mainImageDownloadUri = task.result
                     postData?.mainImage = mainImageDownloadUri.toString()
-
-                    currentPostDoc?.set(postData!!)?.addOnFailureListener {
+                    currentPostDoc?.update("mainImage", mainImageDownloadUri.toString())?.addOnFailureListener {
                         Toast.makeText(
                             this@WritePostActivity,
                             R.string.upload_fail,
@@ -183,20 +185,20 @@ class WritePostActivity: AppCompatActivity() {
                         imagesDownloadUriTmp.add(task.result.toString())
                         if(i == imagesUri.size - 1) {
                             postData?.images = imagesDownloadUriTmp
-                            currentPostDoc?.set(postData!!)
+                            currentPostDoc?.update("images", imagesDownloadUriTmp)
                                 ?.addOnFailureListener {
-                                Toast.makeText(
-                                    this@WritePostActivity,
-                                    R.string.upload_fail,
-                                    Toast.LENGTH_SHORT
-                                ).show()
-                            }?.addOnSuccessListener {
+                                    Toast.makeText(
+                                        this@WritePostActivity,
+                                        R.string.upload_fail,
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                }?.addOnSuccessListener {
                                     Toast.makeText(
                                         this@WritePostActivity,
                                         R.string.upload_success,
                                         Toast.LENGTH_SHORT
                                     ).show()
-                            }
+                                }
                         }
                     }
                 }

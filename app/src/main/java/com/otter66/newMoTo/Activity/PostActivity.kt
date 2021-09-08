@@ -1,31 +1,25 @@
 package com.otter66.newMoTo.Activity
 
-import android.app.Activity
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
-import android.view.LayoutInflater
-import android.view.Menu
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
-import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
-import com.google.firebase.auth.FirebaseUser
-import com.google.firebase.auth.ktx.auth
+import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ktx.firestore
-import com.google.firebase.firestore.ktx.toObject
 import com.google.firebase.ktx.Firebase
+import com.google.firebase.storage.FirebaseStorage
+import com.google.firebase.storage.StorageReference
 import com.otter66.newMoTo.Adapter.PostSliderAdapter
 import com.otter66.newMoTo.Data.Post
 import com.otter66.newMoTo.Data.User
 import com.otter66.newMoTo.R
 import com.smarteist.autoimageslider.SliderView
-import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -36,6 +30,8 @@ class PostActivity: AppCompatActivity() {
     private var currentUserInfo: User? = null
     private lateinit var postSliderAdapter: PostSliderAdapter
     private lateinit var imagesList: MutableList<String>
+    private var storageRef: StorageReference? = null
+    private var db: FirebaseFirestore? = null
 
     private lateinit var toolbar: androidx.appcompat.widget.Toolbar
     private lateinit var postPublisherProfileImageView: ImageView
@@ -58,6 +54,9 @@ class PostActivity: AppCompatActivity() {
         publisherProfileImage = intent.getStringExtra("publisherProfileImage").toString()
         currentUserInfo = intent.getSerializableExtra("currentUserInfo") as User?
 
+        db = Firebase.firestore
+        storageRef = FirebaseStorage.getInstance().reference
+
         viewInit()
 
         //todo 현재 유저의 정보와 글 퍼블리셔가 같으면 슬 수정, 삭제 가능하게
@@ -69,13 +68,56 @@ class PostActivity: AppCompatActivity() {
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.post_menu, menu)
-        Log.d("test_log", "currentUserInfo.id: ${currentUserInfo?.id}, postInformation.publisher: ${postInformation.publisher}")
         if(currentUserInfo?.id.toString() == postInformation.publisher.toString()) {
-            Log.d("test_log", "currentUserInfo?.id == postInformation.publisher")
             menu?.add(Menu.NONE, Menu.FIRST + 0, Menu.NONE, "수정")
             menu?.add(Menu.NONE, Menu.FIRST + 1, Menu.NONE, "삭제")
         }
         return super.onCreateOptionsMenu(menu)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        if(currentUserInfo?.id.toString() == postInformation.publisher.toString()) {
+            //todo    0: 수정  1: 삭제
+            when (item.itemId) {
+                Menu.FIRST + 1 -> deletePost()
+            }
+        }
+        return super.onOptionsItemSelected(item)
+    }
+
+    private fun deletePost() {
+        //todo 막 가져온 게시글 정보 안에 사진들을 검사하고, 사진들을 삭제하고 업데이트 해주고, 사진들이 있다면 삭제해주고 하는게 더 안전할 것 같다
+        if (postInformation.id != null) {
+            if (postInformation.mainImage != null) {
+                val currentPostMainImageRef =
+                    storageRef?.child("images/posts/${postInformation.id}/mainImage")
+                Log.d("test_log", "currentPostMainImageRef: ${currentPostMainImageRef}")
+                currentPostMainImageRef?.delete()
+                    ?.addOnFailureListener {
+                        Toast.makeText(this@PostActivity, R.string.post_delete_fail, Toast.LENGTH_SHORT).show()
+                    }
+            }
+            if (postInformation.images != null) {
+                for (i in 0 until (postInformation.images ?: mutableListOf()).size) {
+                    val currentPostImageRef =
+                        storageRef?.child("images/posts/${postInformation.id}/images$i")
+                    currentPostImageRef?.delete()
+                        ?.addOnFailureListener {
+                            Toast.makeText(this@PostActivity, R.string.post_delete_fail, Toast.LENGTH_SHORT).show()
+                        }
+                }
+            }
+
+            db?.collection("posts")?.document(postInformation.id!!)?.delete()
+                ?.addOnSuccessListener {
+                    finish()
+                }
+
+            //todo 게시글 doc delete
+
+        } else {
+            Toast.makeText(this@PostActivity, R.string.wrong_access, Toast.LENGTH_SHORT).show()
+        }
     }
 
     private fun setPostInformation() {
