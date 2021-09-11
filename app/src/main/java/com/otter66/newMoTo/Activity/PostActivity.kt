@@ -3,7 +3,6 @@ package com.otter66.newMoTo.Activity
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import android.util.Log
 import android.view.*
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
@@ -79,10 +78,17 @@ class PostActivity: AppCompatActivity() {
         if(currentUserInfo?.id.toString() == postInformation.publisher.toString()) {
             //todo    0: 수정  1: 삭제
             when (item.itemId) {
+                Menu.FIRST + 0 -> goToModifyPost()
                 Menu.FIRST + 1 -> deletePost()
             }
         }
         return super.onOptionsItemSelected(item)
+    }
+
+    private fun goToModifyPost() {
+        val intent = Intent(this@PostActivity, WritePostActivity::class.java)
+        intent.putExtra("postInfo", postInformation)
+        startActivity(intent)
     }
 
     private fun deletePost() {
@@ -91,7 +97,6 @@ class PostActivity: AppCompatActivity() {
             if (postInformation.mainImage != null) {
                 val currentPostMainImageRef =
                     storageRef?.child("images/posts/${postInformation.id}/mainImage")
-                Log.d("test_log", "currentPostMainImageRef: ${currentPostMainImageRef}")
                 currentPostMainImageRef?.delete()
                     ?.addOnFailureListener {
                         Toast.makeText(this@PostActivity, R.string.post_delete_fail, Toast.LENGTH_SHORT).show()
@@ -112,8 +117,6 @@ class PostActivity: AppCompatActivity() {
                 ?.addOnSuccessListener {
                     finish()
                 }
-
-            //todo 게시글 doc delete
 
         } else {
             Toast.makeText(this@PostActivity, R.string.wrong_access, Toast.LENGTH_SHORT).show()
@@ -191,5 +194,4 @@ class PostActivity: AppCompatActivity() {
         postLinksContainer = findViewById(R.id.postLinksContainer)
         postCreatedDateTextView = findViewById(R.id.postCreatedDateTextView)
     }
-
 }

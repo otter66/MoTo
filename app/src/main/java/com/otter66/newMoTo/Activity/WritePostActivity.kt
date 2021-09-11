@@ -42,6 +42,7 @@ class WritePostActivity: AppCompatActivity() {
     private var relatedLinkNames: MutableList<String> = mutableListOf()
     private var relatedLinkAddresses: MutableList<String> = mutableListOf()
     private var currentUserId: String? = null
+    private var currentPostInfo: Post? = null
     private var postDatabase: CollectionReference? = null
     private var postData: Post? = null
     private var relatedLinksCount: Int = 0
@@ -68,6 +69,8 @@ class WritePostActivity: AppCompatActivity() {
         viewInit()
 
         currentUserId = intent.getStringExtra("currentUserId")
+        currentPostInfo = intent.getSerializableExtra("postInfo") as Post?
+        if (currentPostInfo != null) setPostInfoOnView()
         postDatabase = Firebase.firestore.collection("posts")
         postImagesSliderAdapter = PostSliderAdapter(this@WritePostActivity, images)
         writePostImagesSlider.setSliderAdapter(postImagesSliderAdapter)
@@ -83,8 +86,7 @@ class WritePostActivity: AppCompatActivity() {
                 .show()
             return
         } else {
-            //super.onBackPressed()
-            finish()
+            super.onBackPressed()
         }
     }
 
@@ -99,14 +101,34 @@ class WritePostActivity: AppCompatActivity() {
             }
         }
 
+
+    private fun setPostInfoOnView() {
+        mainImage = currentPostInfo?.mainImage?.toUri()
+        Glide.with(this@WritePostActivity)
+            .load(mainImage)
+            .override(1000).into(writePostMainImage)
+        writePostProjectTitleEditText.setText(currentPostInfo?.title)
+        writePostTwoLineDescriptionEditText.setText(currentPostInfo?.twoLineDescription)
+        images = currentPostInfo?.images?.toMutableList() ?: mutableListOf()
+        writePostDescriptionEditText.setText(currentPostInfo?.description)
+        writePostUpdateNoteEditText.setText(currentPostInfo?.update)
+        writePostImprovementEditText.setText(currentPostInfo?.improvement)
+        if(currentPostInfo?.linkNames != null) {
+            for(i in 0 until currentPostInfo?.linkNames?.size!!) {
+                addRelatedLink(currentPostInfo?.linkNames?.get(i), currentPostInfo?.linkAddresses?.get(i))
+            }
+        }
+    }
+
     private fun uploadPost() {
+        //todo image upload 할 때 수정 / 새로운 글 나눠야하나..흠
         getRelatedLinks()
         postData = Post(
             null,
             writePostProjectTitleEditText.text?.toString(),
             writePostTwoLineDescriptionEditText.text?.toString(),
-            null,
-            null,
+            mainImage.toString(),
+            images as ArrayList<String>?,
             writePostDescriptionEditText.text?.toString(),
             writePostUpdateNoteEditText.text?.toString(),
             writePostImprovementEditText.text?.toString(),
@@ -119,54 +141,65 @@ class WritePostActivity: AppCompatActivity() {
         val storageRef = FirebaseStorage.getInstance().reference
 
         //글 새로 작성할 때
-        postDatabase?.add(postData!!)?.addOnSuccessListener { currentPostDoc ->
-            currentPostDoc.update("id", currentPostDoc.id)
-                .addOnSuccessListener {
-                    uploadImages(storageRef, currentPostDoc)
-                    //todo id 안올라가면 게시글도 안올라가게
-                    finish()
-                }.addOnFailureListener { }
-        }?.addOnFailureListener {
-            Toast.makeText(this@WritePostActivity, R.string.upload_fail, Toast.LENGTH_SHORT).show()
+        if(currentPostInfo == null) {
+            postDatabase?.add(postData!!)?.addOnSuccessListener { currentPostDoc ->
+                currentPostDoc.update("id", currentPostDoc.id)
+                    .addOnSuccessListener {
+                        uploadImages(storageRef, currentPostDoc)
+                        //todo id 안올라가면 게시글도 안올라가게
+                        finish()
+                    }.addOnFailureListener { }
+            }?.addOnFailureListener {
+                Toast.makeText(this@WritePostActivity, R.string.upload_fail, Toast.LENGTH_SHORT).show()
+            }
+        }
+        //글 수정일 때
+        else {
+            postData!!.id = currentPostInfo!!.id
+            postData!!.publisher = currentPostInfo!!.publisher
+            postDatabase?.document(currentPostInfo!!.id!!)?.set(postData!!)?.addOnSuccessListener {
+                uploadImages(storageRef)
+                finish()
+            }
         }
     }
 
-    private fun uploadImages(storageRef: StorageReference, currentPostDoc: DocumentReference?) {
+    private fun uploadImages(storageRef: StorageReference, currentPostDoc: DocumentReference? = null) {
 
         //todo main Image Upload
         val currentPostMainImageRef =
             storageRef.child("images/posts/${currentPostDoc?.id}/mainImage")
-        if (mainImage != null) {
-            val uploadTask = currentPostMainImageRef.putFile(mainImage!!)
-            uploadTask.addOnFailureListener {
-                Toast.makeText(this@WritePostActivity, R.string.upload_fail, Toast.LENGTH_SHORT)
-                    .show()
-            }.continueWithTask { task ->
-                if (!task.isSuccessful) {
-                    task.exception?.let {
-                        throw it
-                    }
+        val uploadTask = currentPostMainImageRef.putFile(mainImage!!)
+        uploadTask.addOnFailureListener {
+            Toast.makeText(this@WritePostActivity, R.string.upload_fail, Toast.LENGTH_SHORT)
+                .show()
+        }.continueWithTask { task ->
+            if (!task.isSuccessful) {
+                task.exception?.let {
+                    throw it
                 }
-                currentPostMainImageRef.downloadUrl
-            }.addOnCompleteListener { task ->
-                if (task.isSuccessful) {
-                    val mainImageDownloadUri = task.result
-                    postData?.mainImage = mainImageDownloadUri.toString()
-                    currentPostDoc?.update("mainImage", mainImageDownloadUri.toString())?.addOnFailureListener {
+            }
+            currentPostMainImageRef.downloadUrl
+        }.addOnCompleteListener { task ->
+            if (task.isSuccessful) {
+                val mainImageDownloadUri = task.result
+                postData?.mainImage = mainImageDownloadUri.toString()
+                currentPostDoc?.update("mainImage", mainImageDownloadUri.toString())
+                    ?.addOnFailureListener {
                         Toast.makeText(
                             this@WritePostActivity,
                             R.string.upload_fail,
                             Toast.LENGTH_SHORT
                         ).show()
                     }
-                }
             }
         }
+
 
         //todo slider Images Upload
         if (imagesUri.size != 0) {
             val imagesDownloadUriTmp = arrayListOf<String>()
-            for(i in 0 until imagesUri.size) {
+            for (i in 0 until imagesUri.size) {
                 val currentPostImagesRef =
                     storageRef.child("images/posts/${currentPostDoc?.id}/images$i")
                 val uploadTask = currentPostImagesRef.putFile(imagesUri[i])
@@ -183,7 +216,7 @@ class WritePostActivity: AppCompatActivity() {
                 }.addOnCompleteListener { task ->
                     if (task.isSuccessful) {
                         imagesDownloadUriTmp.add(task.result.toString())
-                        if(i == imagesUri.size - 1) {
+                        if (i == imagesUri.size - 1) {
                             postData?.images = imagesDownloadUriTmp
                             currentPostDoc?.update("images", imagesDownloadUriTmp)
                                 ?.addOnFailureListener {
@@ -238,7 +271,7 @@ class WritePostActivity: AppCompatActivity() {
     }
 
     //todo link delete시 문제있음
-    private fun addRelatedLink() {
+    private fun addRelatedLink(linkName: String? = null, linkAddress: String? = null) {
         val linkContainer = LinearLayout(this@WritePostActivity)
         linkContainer.layoutParams =
             LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)
@@ -275,6 +308,8 @@ class WritePostActivity: AppCompatActivity() {
         linkAddressEditTexts[relatedLinksCount].setTextColor(getColor(R.color.black))
         linkNameEditTexts[relatedLinksCount].textSize = 15f
         linkAddressEditTexts[relatedLinksCount].textSize = 15f
+        if(linkName != null) linkNameEditTexts[relatedLinksCount].setText(linkName)
+        if(linkAddress != null) linkAddressEditTexts[relatedLinksCount].setText(linkAddress)
 
         linkNameAndDeleteContainer.addView(linkNameEditTexts[relatedLinksCount])
         linkNameAndDeleteContainer.addView(linkDeleteButton)

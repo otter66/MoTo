@@ -8,7 +8,7 @@ import java.util.*
 import kotlin.collections.ArrayList
 
 data class Post(
-    val id: String? = null,
+    var id: String? = null,
     val title: String? = null,
     val twoLineDescription: String? = null,
     var mainImage: String? = null,
@@ -18,6 +18,6 @@ data class Post(
     val improvement: String? = null,
     var linkNames: ArrayList<String>? = null,
     var linkAddresses: ArrayList<String>? = null,
-    val publisher: String? = null,
+    var publisher: String? = null,
     val createdDate: Date? = null
 ) : Serializable
