@@ -58,7 +58,7 @@ class PostActivity: AppCompatActivity() {
 
         viewInit()
 
-        //todo 현재 유저의 정보와 글 퍼블리셔가 같으면 슬 수정, 삭제 가능하게
+        //todo 글 수정 기능 추가 필요
 
         postSliderAdapter = PostSliderAdapter(this@PostActivity, imagesList)
         setSupportActionBar(toolbar)
@@ -68,7 +68,7 @@ class PostActivity: AppCompatActivity() {
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.post_menu, menu)
         if(currentUserInfo?.id.toString() == postInformation.publisher.toString()) {
-            menu?.add(Menu.NONE, Menu.FIRST + 0, Menu.NONE, "수정")
+            //menu?.add(Menu.NONE, Menu.FIRST + 0, Menu.NONE, "수정")
             menu?.add(Menu.NONE, Menu.FIRST + 1, Menu.NONE, "삭제")
         }
         return super.onCreateOptionsMenu(menu)
@@ -78,7 +78,7 @@ class PostActivity: AppCompatActivity() {
         if(currentUserInfo?.id.toString() == postInformation.publisher.toString()) {
             //todo    0: 수정  1: 삭제
             when (item.itemId) {
-                Menu.FIRST + 0 -> goToModifyPost()
+                //Menu.FIRST + 0 -> goToModifyPost()
                 Menu.FIRST + 1 -> deletePost()
             }
         }

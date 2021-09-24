@@ -23,15 +23,13 @@ import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
+import com.google.firebase.storage.UploadTask
 import com.otter66.newMoTo.Adapter.PostSliderAdapter
 import com.otter66.newMoTo.Data.Post
 import com.otter66.newMoTo.R
 import com.smarteist.autoimageslider.SliderView
-import java.io.File
-import java.lang.reflect.Array
 import java.util.*
 import kotlin.collections.ArrayList
-
 
 class WritePostActivity: AppCompatActivity() {
 
@@ -76,7 +74,7 @@ class WritePostActivity: AppCompatActivity() {
         writePostImagesSlider.setSliderAdapter(postImagesSliderAdapter)
 
         //todo adapter에서 item으로 만들었기 때문에 item 클릭시 이벤트로 해줘야하는 것 같다..
-        Toast.makeText(this, "제 실력이 미천하여 사진들은 선택 후 수정이 불가합니다", Toast.LENGTH_SHORT).show()
+        Toast.makeText(this, "제 실력이 미천하여 글 수정이 불가합니다..", Toast.LENGTH_SHORT).show()
     }
 
     override fun onBackPressed() {
@@ -146,7 +144,6 @@ class WritePostActivity: AppCompatActivity() {
                 currentPostDoc.update("id", currentPostDoc.id)
                     .addOnSuccessListener {
                         uploadImages(storageRef, currentPostDoc)
-                        //todo id 안올라가면 게시글도 안올라가게
                         finish()
                     }.addOnFailureListener { }
             }?.addOnFailureListener {
@@ -165,11 +162,12 @@ class WritePostActivity: AppCompatActivity() {
     }
 
     private fun uploadImages(storageRef: StorageReference, currentPostDoc: DocumentReference? = null) {
+        //todo [ERROR] 처음 게시글을 올릴 때만 정상적으로 작동
 
         //todo main Image Upload
         val currentPostMainImageRef =
             storageRef.child("images/posts/${currentPostDoc?.id}/mainImage")
-        val uploadTask = currentPostMainImageRef.putFile(mainImage!!)
+        var uploadTask: UploadTask = currentPostMainImageRef.putFile(mainImage!!)
         uploadTask.addOnFailureListener {
             Toast.makeText(this@WritePostActivity, R.string.upload_fail, Toast.LENGTH_SHORT)
                 .show()
@@ -184,7 +182,8 @@ class WritePostActivity: AppCompatActivity() {
             if (task.isSuccessful) {
                 val mainImageDownloadUri = task.result
                 postData?.mainImage = mainImageDownloadUri.toString()
-                currentPostDoc?.update("mainImage", mainImageDownloadUri.toString())
+                currentPostDoc
+                    ?.update("mainImage", mainImageDownloadUri.toString())
                     ?.addOnFailureListener {
                         Toast.makeText(
                             this@WritePostActivity,
@@ -197,7 +196,7 @@ class WritePostActivity: AppCompatActivity() {
 
 
         //todo slider Images Upload
-        if (imagesUri.size != 0) {
+        if (imagesUri.size != 0 && !imagesUri[0].toString().contains("http")) {
             val imagesDownloadUriTmp = arrayListOf<String>()
             for (i in 0 until imagesUri.size) {
                 val currentPostImagesRef =
