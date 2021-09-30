@@ -50,7 +50,7 @@
             <TextView
                 android:id="@+id/itemPostUserIdTextView"
                 android:textColor="@color/black"
-                android:textSize="15sp"
+                android:textSize="@dimen/text2"
                 android:fontFamily="@font/bm_jua"
                 android:layout_gravity="left|bottom"
                 android:layout_marginBottom="8dp"
@@ -69,7 +69,7 @@
 
             <TextView
                 android:id="@+id/itemPostTitleTextView"
-                android:textSize="24sp"
+                android:textSize="@dimen/title2"
                 android:fontFamily="@font/bm_jua"
                 android:textColor="@color/black"
                 android:layout_width="match_parent"
@@ -78,7 +78,7 @@
             <TextView
                 android:layout_marginTop="3dp"
                 android:id="@+id/itemPostTwoLineDescriptionTextView"
-                android:textSize="15sp"
+                android:textSize="@dimen/text2"
                 android:fontFamily="@font/nanum_myeongjo"
                 android:textColor="@color/black"
                 android:layout_width="match_parent"

@@ -62,7 +62,7 @@
                 <EditText
                     android:id="@+id/writePostProjectTitleEditText"
                     android:fontFamily="@font/bm_jua"
-                    android:textSize="28sp"
+                    android:textSize="@dimen/title1"
                     android:textColor="@color/black"
                     android:hint="@string/please_project_name"
                     android:layout_width="match_parent"
@@ -71,7 +71,7 @@
                 <EditText
                     android:id="@+id/writePostTwoLineDescriptionEditText"
                     android:fontFamily="@font/nanum_myeongjo"
-                    android:textSize="15sp"
+                    android:textSize="@dimen/text2"
                     android:textColor="@color/black"
                     android:hint="@string/please_project_two_line_description"
                     android:layout_marginTop="12dp"
@@ -127,7 +127,7 @@
                     android:id="@+id/writePostDescriptionEditText"
                     android:hint="@string/please_project_description"
                     android:textColor="@color/black"
-                    android:textSize="15sp"
+                    android:textSize="@dimen/text2"
                     android:fontFamily="@font/nanum_myeongjo"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"/>
@@ -136,7 +136,7 @@
                     android:text="@string/update_note"
                     android:layout_marginTop="16dp"
                     android:textColor="@color/black"
-                    android:textSize="22sp"
+                    android:textSize="@dimen/title3"
                     android:fontFamily="@font/bm_jua"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"/>
@@ -145,7 +145,7 @@
                     android:id="@+id/writePostUpdateNoteEditText"
                     android:hint="@string/please_project_update_note"
                     android:textColor="@color/black"
-                    android:textSize="15sp"
+                    android:textSize="@dimen/text2"
                     android:fontFamily="@font/nanum_myeongjo"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"/>
@@ -154,7 +154,7 @@
                     android:text="@string/improvement"
                     android:layout_marginTop="16dp"
                     android:textColor="@color/black"
-                    android:textSize="22sp"
+                    android:textSize="@dimen/title3"
                     android:fontFamily="@font/bm_jua"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"/>
@@ -163,7 +163,7 @@
                     android:id="@+id/writePostImprovementEditText"
                     android:hint="@string/please_project_improvement"
                     android:textColor="@color/black"
-                    android:textSize="15sp"
+                    android:textSize="@dimen/text2"
                     android:fontFamily="@font/nanum_myeongjo"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"/>
@@ -172,7 +172,7 @@
                     android:text="@string/related_link"
                     android:layout_marginTop="16dp"
                     android:textColor="@color/black"
-                    android:textSize="20sp"
+                    android:textSize="@dimen/title4"
                     android:fontFamily="@font/bm_jua"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"/>

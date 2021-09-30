@@ -16,7 +16,7 @@
         <TextView
             android:text="앱에서 사용 할 아이디를 입력해주세요."
             android:textColor="@color/black"
-            android:textSize="25sp"
+            android:textSize="@dimen/title2"
             android:fontFamily="@font/bm_jua"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"/>
@@ -35,7 +35,7 @@
             <TextView
                 android:id="@+id/doubleCheckButton"
                 android:text="중복확인"
-                android:textSize="20sp"
+                android:textSize="@dimen/title4"
                 android:textColor="@color/blue"
                 android:fontFamily="@font/bm_jua"
                 android:layout_marginLeft="20dp"
