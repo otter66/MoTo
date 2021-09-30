@@ -13,11 +13,27 @@ android {
         applicationId "com.otter66.newMoTo"
         minSdk 28
         targetSdk 31
-        versionCode 1
-        versionName "1.0"
+        versionCode 2
+        versionName "2.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
+
+//    flavorDimensions "default"
+//    productFlavors {
+//        demo {
+//            dimension "default"
+//            //noinspection GradlePath
+//            applicationIdSuffix "com.otter66.newMoTo.demo"
+//            versionNameSuffix "1.0.0-demo"
+//        }
+//        market {
+//            dimension = "default"
+//            //noinspection GradlePath
+//            applicationIdSuffix = "com.otter66.newMoTo.market"
+//            versionNameSuffix = "1.0.0-market"
+//        }
+//    }
 
     buildTypes {
         release {

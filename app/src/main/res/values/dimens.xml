@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="title1">28sp</dimen>
+    <dimen name="title2">24sp</dimen>
+    <dimen name="title3">22sp</dimen>
+    <dimen name="title4">20sp</dimen>
+
+    <dimen name="text1">17sp</dimen>
+    <dimen name="text2">15sp</dimen>
+    <dimen name="text3">13sp</dimen>
+</resources>

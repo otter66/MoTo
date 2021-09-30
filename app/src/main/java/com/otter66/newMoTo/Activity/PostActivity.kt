@@ -58,8 +58,6 @@ class PostActivity: AppCompatActivity() {
 
         viewInit()
 
-        //todo 글 수정 기능 추가 필요
-
         postSliderAdapter = PostSliderAdapter(this@PostActivity, imagesList)
         setSupportActionBar(toolbar)
         setPostInformation()
@@ -76,7 +74,7 @@ class PostActivity: AppCompatActivity() {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         if(currentUserInfo?.id.toString() == postInformation.publisher.toString()) {
-            //todo    0: 수정  1: 삭제
+            //todo 0: 수정  1: 삭제
             when (item.itemId) {
                 //Menu.FIRST + 0 -> goToModifyPost()
                 Menu.FIRST + 1 -> deletePost()

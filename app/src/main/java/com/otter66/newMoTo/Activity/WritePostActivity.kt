@@ -7,7 +7,6 @@ import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
-import android.util.Log
 import android.view.View
 import android.widget.*
 import android.widget.LinearLayout.LayoutParams
@@ -40,7 +39,7 @@ class WritePostActivity: AppCompatActivity() {
     private var relatedLinkNames: MutableList<String> = mutableListOf()
     private var relatedLinkAddresses: MutableList<String> = mutableListOf()
     private var currentUserId: String? = null
-    private var currentPostInfo: Post? = null
+    private var postInfo: Post? = null
     private var postDatabase: CollectionReference? = null
     private var postData: Post? = null
     private var relatedLinksCount: Int = 0
@@ -67,8 +66,8 @@ class WritePostActivity: AppCompatActivity() {
         viewInit()
 
         currentUserId = intent.getStringExtra("currentUserId")
-        currentPostInfo = intent.getSerializableExtra("postInfo") as Post?
-        if (currentPostInfo != null) setPostInfoOnView()
+        postInfo = intent.getSerializableExtra("postInfo") as Post?
+        if (postInfo != null) setPostInfoOnView()
         postDatabase = Firebase.firestore.collection("posts")
         postImagesSliderAdapter = PostSliderAdapter(this@WritePostActivity, images)
         writePostImagesSlider.setSliderAdapter(postImagesSliderAdapter)
@@ -101,19 +100,19 @@ class WritePostActivity: AppCompatActivity() {
 
 
     private fun setPostInfoOnView() {
-        mainImage = currentPostInfo?.mainImage?.toUri()
+        mainImage = postInfo?.mainImage?.toUri()
         Glide.with(this@WritePostActivity)
             .load(mainImage)
             .override(1000).into(writePostMainImage)
-        writePostProjectTitleEditText.setText(currentPostInfo?.title)
-        writePostTwoLineDescriptionEditText.setText(currentPostInfo?.twoLineDescription)
-        images = currentPostInfo?.images?.toMutableList() ?: mutableListOf()
-        writePostDescriptionEditText.setText(currentPostInfo?.description)
-        writePostUpdateNoteEditText.setText(currentPostInfo?.update)
-        writePostImprovementEditText.setText(currentPostInfo?.improvement)
-        if(currentPostInfo?.linkNames != null) {
-            for(i in 0 until currentPostInfo?.linkNames?.size!!) {
-                addRelatedLink(currentPostInfo?.linkNames?.get(i), currentPostInfo?.linkAddresses?.get(i))
+        writePostProjectTitleEditText.setText(postInfo?.title)
+        writePostTwoLineDescriptionEditText.setText(postInfo?.twoLineDescription)
+        images = postInfo?.images?.toMutableList() ?: mutableListOf()
+        writePostDescriptionEditText.setText(postInfo?.description)
+        writePostUpdateNoteEditText.setText(postInfo?.update)
+        writePostImprovementEditText.setText(postInfo?.improvement)
+        if(postInfo?.linkNames != null) {
+            for(i in 0 until postInfo?.linkNames?.size!!) {
+                addRelatedLink(postInfo?.linkNames?.get(i), postInfo?.linkAddresses?.get(i))
             }
         }
     }
@@ -139,7 +138,7 @@ class WritePostActivity: AppCompatActivity() {
         val storageRef = FirebaseStorage.getInstance().reference
 
         //글 새로 작성할 때
-        if(currentPostInfo == null) {
+        if(postInfo == null) {
             postDatabase?.add(postData!!)?.addOnSuccessListener { currentPostDoc ->
                 currentPostDoc.update("id", currentPostDoc.id)
                     .addOnSuccessListener {
@@ -152,9 +151,9 @@ class WritePostActivity: AppCompatActivity() {
         }
         //글 수정일 때
         else {
-            postData!!.id = currentPostInfo!!.id
-            postData!!.publisher = currentPostInfo!!.publisher
-            postDatabase?.document(currentPostInfo!!.id!!)?.set(postData!!)?.addOnSuccessListener {
+            postData!!.id = postInfo!!.id
+            postData!!.publisher = postInfo!!.publisher
+            postDatabase?.document(postInfo!!.id!!)?.set(postData!!)?.addOnSuccessListener {
                 uploadImages(storageRef)
                 finish()
             }
