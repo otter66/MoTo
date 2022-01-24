@@ -17,6 +17,7 @@ import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.FirebaseFirestore
 import com.otter66.newMoTo.Fragment.NoticeBoardFragment
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.google.android.material.navigation.NavigationBarView
 import com.google.firebase.firestore.ktx.toObject
 import com.otter66.newMoTo.Data.User
 import kotlinx.coroutines.launch
@@ -36,6 +37,9 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        /*
+        * 로그인 정보를 확인하여 로그인되어있다면 현재의 Activity를 그대로 이용합니다.
+        * 첫 이용이라면 구글 로그인 -> 회원가입Activity 를 실행합니다. */
         lifecycleScope.launch {
             //로그인
             auth = Firebase.auth
@@ -47,9 +51,7 @@ class MainActivity : AppCompatActivity() {
                     db?.collection("users")?.document(user!!.uid)?.get()?.addOnSuccessListener { documentSnapshot ->
                         currentUserInfo = documentSnapshot.toObject<User>()
                     }?.await()
-                    //todo dkdkdkdkkk await 달아줬는데도 왜 왜그러는거야
 
-                    //버튼 이벤트 연결
                     bottomNavigationView = findViewById(R.id.bottomNavigationView)
                     bottomNavigationView.setOnItemSelectedListener(onItemSelectedListener)
 
@@ -61,8 +63,8 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private var onItemSelectedListener: BottomNavigationView.OnNavigationItemSelectedListener
-    = BottomNavigationView.OnNavigationItemSelectedListener {
+    private var onItemSelectedListener: NavigationBarView.OnItemSelectedListener
+    = NavigationBarView.OnItemSelectedListener {
         when (it.itemId) {
             R.id.homePageItem -> {
                 val fragment = NoticeBoardFragment()
